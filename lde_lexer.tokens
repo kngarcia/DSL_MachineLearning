@@ -1,0 +1,14 @@
+SUMA=1
+RESTA=2
+MULT=3
+DIV=4
+LPAREN=5
+RPAREN=6
+NUMERO=7
+ESPACIO=8
+'+'=1
+'-'=2
+'*'=3
+'/'=4
+'('=5
+')'=6
