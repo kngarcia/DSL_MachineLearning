@@ -4,6 +4,10 @@ from lde_parser import lde_parser
 
 class evalVisitor(lde_parserVisitor):
 
+    # Manejo de la regla inicial `programa`
+    def visitPrograma(self, ctx: lde_parser.ProgramaContext):
+        return self.visit(ctx.expresion())  # Visitar la subregla `expresion`
+
     def visitExpresion(self, ctx: lde_parser.ExpresionContext):
         izquierda = self.visit(ctx.termino(0))  # Inicia con el primer término
         for i in range(1, len(ctx.termino())):
