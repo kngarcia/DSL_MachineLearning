@@ -21,9 +21,14 @@ SINH: 'sinh';
 COSH: 'cosh';
 TANH: 'tanh';
 
-// Paréntesis
+// Paréntesis y corchetes
 LPAREN: '(';
 RPAREN: ')';
+LBRACKET: '[';  // Apertura de listas y matrices
+RBRACKET: ']';  // Cierre de listas y matrices
+
+// Separadores
+COMA: ',';  // Separador para elementos de listas y matrices
 
 // Números (enteros y decimales)
 NUMERO: [0-9]+ ('.' [0-9]+)?;
