@@ -8,10 +8,18 @@ DIV: '/';
 MOD: '%';
 EXP: '^';     // Operador de exponenciación
 
-// Funciones trigonométricas
+// Funciones trigonométricas básicas
 SIN: 'sin';
 COS: 'cos';
 TAN: 'tan';
+
+// Funciones trigonométricas avanzadas
+ASIN: 'asin';
+ACOS: 'acos';
+ATAN: 'atan';
+SINH: 'sinh';
+COSH: 'cosh';
+TANH: 'tanh';
 
 // Paréntesis
 LPAREN: '(';

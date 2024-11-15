@@ -13,7 +13,7 @@ class evalVisitor(lde_parserVisitor):
                 izquierda += derecha
             elif operador == '-':
                 izquierda -= derecha
-        return izquierda
+        return round(izquierda, 4)  # Redondear a 4 decimales
 
     def visitTermino(self, ctx: lde_parser.TerminoContext):
         izquierda = self.visit(ctx.factor(0))  # Inicia con el primer factor
@@ -31,7 +31,7 @@ class evalVisitor(lde_parserVisitor):
                 izquierda %= derecha  # Realizar la operación de módulo
             elif operador == '^':  # Exponenciación
                 izquierda **= derecha
-        return izquierda
+        return round(izquierda, 4)  # Redondear a 4 decimales
 
     def visitFactor(self, ctx: lde_parser.FactorContext):
         if ctx.NUMERO():
@@ -46,13 +46,25 @@ class evalVisitor(lde_parserVisitor):
             raise ValueError("Error: Factor no válido.")
 
     def visitTrigonometrica(self, ctx: lde_parser.TrigonometricaContext):
-        operador = ctx.getChild(0).getText()  # Obtener la función trigonométrica (sin, cos, tan)
+        operador = ctx.getChild(0).getText()  # Obtener la función trigonométrica (sin, cos, tan, asin, etc.)
         argumento = self.visit(ctx.expresion())  # Evaluar el argumento de la función trigonométrica
         if operador == 'sin':
-            return math.sin(math.radians(argumento))  # Convertir a radianes
+            return round(math.sin(math.radians(argumento)), 4)  # Convertir a radianes y redondear
         elif operador == 'cos':
-            return math.cos(math.radians(argumento))  # Convertir a radianes
+            return round(math.cos(math.radians(argumento)), 4)  # Convertir a radianes y redondear
         elif operador == 'tan':
-            return math.tan(math.radians(argumento))  # Convertir a radianes
+            return round(math.tan(math.radians(argumento)), 4)  # Convertir a radianes y redondear
+        elif operador == 'asin':
+            return round(math.degrees(math.asin(argumento)), 4)  # Convertir de radianes a grados y redondear
+        elif operador == 'acos':
+            return round(math.degrees(math.acos(argumento)), 4)  # Convertir de radianes a grados y redondear
+        elif operador == 'atan':
+            return round(math.degrees(math.atan(argumento)), 4)  # Convertir de radianes a grados y redondear
+        elif operador == 'sinh':
+            return round(math.sinh(argumento), 4)
+        elif operador == 'cosh':
+            return round(math.cosh(argumento), 4)
+        elif operador == 'tanh':
+            return round(math.tanh(argumento), 4)
         else:
             raise ValueError("Error: Función trigonométrica no reconocida.")

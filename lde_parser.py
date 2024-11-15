@@ -10,18 +10,18 @@ else:
 
 def serializedATN():
     return [
-        4,1,13,40,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,1,0,1,0,1,0,5,0,12,8,0,
+        4,1,19,40,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,1,0,1,0,1,0,5,0,12,8,0,
         10,0,12,0,15,9,0,1,1,1,1,1,1,5,1,20,8,1,10,1,12,1,23,9,1,1,2,1,2,
         1,2,1,2,1,2,1,2,1,2,1,2,3,2,33,8,2,1,3,1,3,1,3,1,3,1,3,1,3,0,0,4,
-        0,2,4,6,0,3,1,0,1,2,1,0,3,6,1,0,7,9,40,0,8,1,0,0,0,2,16,1,0,0,0,
+        0,2,4,6,0,3,1,0,1,2,1,0,3,6,1,0,7,15,40,0,8,1,0,0,0,2,16,1,0,0,0,
         4,32,1,0,0,0,6,34,1,0,0,0,8,13,3,2,1,0,9,10,7,0,0,0,10,12,3,2,1,
         0,11,9,1,0,0,0,12,15,1,0,0,0,13,11,1,0,0,0,13,14,1,0,0,0,14,1,1,
         0,0,0,15,13,1,0,0,0,16,21,3,4,2,0,17,18,7,1,0,0,18,20,3,4,2,0,19,
         17,1,0,0,0,20,23,1,0,0,0,21,19,1,0,0,0,21,22,1,0,0,0,22,3,1,0,0,
-        0,23,21,1,0,0,0,24,33,5,12,0,0,25,26,5,10,0,0,26,27,3,0,0,0,27,28,
-        5,11,0,0,28,33,1,0,0,0,29,30,5,2,0,0,30,33,3,4,2,0,31,33,3,6,3,0,
+        0,23,21,1,0,0,0,24,33,5,18,0,0,25,26,5,16,0,0,26,27,3,0,0,0,27,28,
+        5,17,0,0,28,33,1,0,0,0,29,30,5,2,0,0,30,33,3,4,2,0,31,33,3,6,3,0,
         32,24,1,0,0,0,32,25,1,0,0,0,32,29,1,0,0,0,32,31,1,0,0,0,33,5,1,0,
-        0,0,34,35,7,2,0,0,35,36,5,10,0,0,36,37,3,0,0,0,37,38,5,11,0,0,38,
+        0,0,34,35,7,2,0,0,35,36,5,16,0,0,36,37,3,0,0,0,37,38,5,17,0,0,38,
         7,1,0,0,0,3,13,21,32
     ]
 
@@ -36,10 +36,12 @@ class lde_parser ( Parser ):
     sharedContextCache = PredictionContextCache()
 
     literalNames = [ "<INVALID>", "'+'", "'-'", "'*'", "'/'", "'%'", "'^'", 
-                     "'sin'", "'cos'", "'tan'", "'('", "')'" ]
+                     "'sin'", "'cos'", "'tan'", "'asin'", "'acos'", "'atan'", 
+                     "'sinh'", "'cosh'", "'tanh'", "'('", "')'" ]
 
     symbolicNames = [ "<INVALID>", "SUMA", "RESTA", "MULT", "DIV", "MOD", 
-                      "EXP", "SIN", "COS", "TAN", "LPAREN", "RPAREN", "NUMERO", 
+                      "EXP", "SIN", "COS", "TAN", "ASIN", "ACOS", "ATAN", 
+                      "SINH", "COSH", "TANH", "LPAREN", "RPAREN", "NUMERO", 
                       "ESPACIO" ]
 
     RULE_expresion = 0
@@ -59,10 +61,16 @@ class lde_parser ( Parser ):
     SIN=7
     COS=8
     TAN=9
-    LPAREN=10
-    RPAREN=11
-    NUMERO=12
-    ESPACIO=13
+    ASIN=10
+    ACOS=11
+    ATAN=12
+    SINH=13
+    COSH=14
+    TANH=15
+    LPAREN=16
+    RPAREN=17
+    NUMERO=18
+    ESPACIO=19
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -306,12 +314,12 @@ class lde_parser ( Parser ):
             self.state = 32
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [12]:
+            if token in [18]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 24
                 self.match(lde_parser.NUMERO)
                 pass
-            elif token in [10]:
+            elif token in [16]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 25
                 self.match(lde_parser.LPAREN)
@@ -327,7 +335,7 @@ class lde_parser ( Parser ):
                 self.state = 30
                 self.factor()
                 pass
-            elif token in [7, 8, 9]:
+            elif token in [7, 8, 9, 10, 11, 12, 13, 14, 15]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 31
                 self.trigonometrica()
@@ -370,6 +378,24 @@ class lde_parser ( Parser ):
         def TAN(self):
             return self.getToken(lde_parser.TAN, 0)
 
+        def ASIN(self):
+            return self.getToken(lde_parser.ASIN, 0)
+
+        def ACOS(self):
+            return self.getToken(lde_parser.ACOS, 0)
+
+        def ATAN(self):
+            return self.getToken(lde_parser.ATAN, 0)
+
+        def SINH(self):
+            return self.getToken(lde_parser.SINH, 0)
+
+        def COSH(self):
+            return self.getToken(lde_parser.COSH, 0)
+
+        def TANH(self):
+            return self.getToken(lde_parser.TANH, 0)
+
         def getRuleIndex(self):
             return lde_parser.RULE_trigonometrica
 
@@ -399,7 +425,7 @@ class lde_parser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 34
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 896) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 65408) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)

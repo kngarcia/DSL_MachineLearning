@@ -9,5 +9,5 @@ factor: NUMERO
       | RESTA factor
       | trigonometrica
       ;
-      
-trigonometrica: (SIN | COS | TAN) LPAREN expresion RPAREN;  // Reglas para funciones trigonométricas
+
+trigonometrica: (SIN | COS | TAN | ASIN | ACOS | ATAN | SINH | COSH | TANH) LPAREN expresion RPAREN;  // Nuevas funciones trigonométricas
