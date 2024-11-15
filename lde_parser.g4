@@ -1,17 +1,20 @@
 parser grammar lde_parser;
 
-options { tokenVocab=lde_lexer; }  // Importar los tokens del lexer
+options { tokenVocab=lde_lexer; }
 
-// Punto de entrada del parser
 programa: expresion EOF;
 
-// Reglas para las expresiones aritméticas con niveles de precedencia
 expresion
-    : expresion SUMA expresion         # suma            // Suma binaria
-    | expresion RESTA expresion        # resta           // Resta binaria
-    | expresion MULT expresion         # multiplicacion  // Multiplicación
-    | expresion DIV expresion          # division        // División
-    | RESTA expresion                  # negativo        // Signo negativo unario, alta precedencia
-    | LPAREN expresion RPAREN          # parenExpr       // Expresiones entre paréntesis
-    | NUMERO                           # numero          // Números
+    : termino ((SUMA | RESTA) termino)*  // Ahora expresion maneja suma y resta después de termino
     ;
+
+termino
+    : factor ((MULT | DIV) factor)*     // termino maneja multiplicación y división
+    ;
+
+factor
+    : NUMERO                          // número literal
+    | LPAREN expresion RPAREN          // expresión entre paréntesis
+    | RESTA factor                     // operador unario negativo
+    ;
+

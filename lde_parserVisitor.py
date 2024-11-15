@@ -14,38 +14,18 @@ class lde_parserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by lde_parser#suma.
-    def visitSuma(self, ctx:lde_parser.SumaContext):
+    # Visit a parse tree produced by lde_parser#expresion.
+    def visitExpresion(self, ctx:lde_parser.ExpresionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by lde_parser#division.
-    def visitDivision(self, ctx:lde_parser.DivisionContext):
+    # Visit a parse tree produced by lde_parser#termino.
+    def visitTermino(self, ctx:lde_parser.TerminoContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by lde_parser#multiplicacion.
-    def visitMultiplicacion(self, ctx:lde_parser.MultiplicacionContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by lde_parser#numero.
-    def visitNumero(self, ctx:lde_parser.NumeroContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by lde_parser#negativo.
-    def visitNegativo(self, ctx:lde_parser.NegativoContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by lde_parser#resta.
-    def visitResta(self, ctx:lde_parser.RestaContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by lde_parser#parenExpr.
-    def visitParenExpr(self, ctx:lde_parser.ParenExprContext):
+    # Visit a parse tree produced by lde_parser#factor.
+    def visitFactor(self, ctx:lde_parser.FactorContext):
         return self.visitChildren(ctx)
 
 

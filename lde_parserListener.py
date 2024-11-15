@@ -17,66 +17,30 @@ class lde_parserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by lde_parser#suma.
-    def enterSuma(self, ctx:lde_parser.SumaContext):
+    # Enter a parse tree produced by lde_parser#expresion.
+    def enterExpresion(self, ctx:lde_parser.ExpresionContext):
         pass
 
-    # Exit a parse tree produced by lde_parser#suma.
-    def exitSuma(self, ctx:lde_parser.SumaContext):
-        pass
-
-
-    # Enter a parse tree produced by lde_parser#division.
-    def enterDivision(self, ctx:lde_parser.DivisionContext):
-        pass
-
-    # Exit a parse tree produced by lde_parser#division.
-    def exitDivision(self, ctx:lde_parser.DivisionContext):
+    # Exit a parse tree produced by lde_parser#expresion.
+    def exitExpresion(self, ctx:lde_parser.ExpresionContext):
         pass
 
 
-    # Enter a parse tree produced by lde_parser#multiplicacion.
-    def enterMultiplicacion(self, ctx:lde_parser.MultiplicacionContext):
+    # Enter a parse tree produced by lde_parser#termino.
+    def enterTermino(self, ctx:lde_parser.TerminoContext):
         pass
 
-    # Exit a parse tree produced by lde_parser#multiplicacion.
-    def exitMultiplicacion(self, ctx:lde_parser.MultiplicacionContext):
-        pass
-
-
-    # Enter a parse tree produced by lde_parser#numero.
-    def enterNumero(self, ctx:lde_parser.NumeroContext):
-        pass
-
-    # Exit a parse tree produced by lde_parser#numero.
-    def exitNumero(self, ctx:lde_parser.NumeroContext):
+    # Exit a parse tree produced by lde_parser#termino.
+    def exitTermino(self, ctx:lde_parser.TerminoContext):
         pass
 
 
-    # Enter a parse tree produced by lde_parser#negativo.
-    def enterNegativo(self, ctx:lde_parser.NegativoContext):
+    # Enter a parse tree produced by lde_parser#factor.
+    def enterFactor(self, ctx:lde_parser.FactorContext):
         pass
 
-    # Exit a parse tree produced by lde_parser#negativo.
-    def exitNegativo(self, ctx:lde_parser.NegativoContext):
-        pass
-
-
-    # Enter a parse tree produced by lde_parser#resta.
-    def enterResta(self, ctx:lde_parser.RestaContext):
-        pass
-
-    # Exit a parse tree produced by lde_parser#resta.
-    def exitResta(self, ctx:lde_parser.RestaContext):
-        pass
-
-
-    # Enter a parse tree produced by lde_parser#parenExpr.
-    def enterParenExpr(self, ctx:lde_parser.ParenExprContext):
-        pass
-
-    # Exit a parse tree produced by lde_parser#parenExpr.
-    def exitParenExpr(self, ctx:lde_parser.ParenExprContext):
+    # Exit a parse tree produced by lde_parser#factor.
+    def exitFactor(self, ctx:lde_parser.FactorContext):
         pass
 
 
