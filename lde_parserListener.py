@@ -17,21 +17,21 @@ class lde_parserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by lde_parser#division.
-    def enterDivision(self, ctx:lde_parser.DivisionContext):
-        pass
-
-    # Exit a parse tree produced by lde_parser#division.
-    def exitDivision(self, ctx:lde_parser.DivisionContext):
-        pass
-
-
     # Enter a parse tree produced by lde_parser#suma.
     def enterSuma(self, ctx:lde_parser.SumaContext):
         pass
 
     # Exit a parse tree produced by lde_parser#suma.
     def exitSuma(self, ctx:lde_parser.SumaContext):
+        pass
+
+
+    # Enter a parse tree produced by lde_parser#division.
+    def enterDivision(self, ctx:lde_parser.DivisionContext):
+        pass
+
+    # Exit a parse tree produced by lde_parser#division.
+    def exitDivision(self, ctx:lde_parser.DivisionContext):
         pass
 
 

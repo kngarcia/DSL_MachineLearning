@@ -14,11 +14,11 @@ def serializedATN():
         1,1,3,1,16,8,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,
         1,30,8,1,10,1,12,1,33,9,1,1,1,0,1,2,2,0,2,0,0,38,0,4,1,0,0,0,2,15,
         1,0,0,0,4,5,3,2,1,0,5,6,5,0,0,1,6,1,1,0,0,0,7,8,6,1,-1,0,8,9,5,2,
-        0,0,9,16,3,2,1,7,10,11,5,5,0,0,11,12,3,2,1,0,12,13,5,6,0,0,13,16,
+        0,0,9,16,3,2,1,3,10,11,5,5,0,0,11,12,3,2,1,0,12,13,5,6,0,0,13,16,
         1,0,0,0,14,16,5,7,0,0,15,7,1,0,0,0,15,10,1,0,0,0,15,14,1,0,0,0,16,
-        31,1,0,0,0,17,18,10,6,0,0,18,19,5,3,0,0,19,30,3,2,1,7,20,21,10,5,
-        0,0,21,22,5,4,0,0,22,30,3,2,1,6,23,24,10,4,0,0,24,25,5,1,0,0,25,
-        30,3,2,1,5,26,27,10,3,0,0,27,28,5,2,0,0,28,30,3,2,1,4,29,17,1,0,
+        31,1,0,0,0,17,18,10,7,0,0,18,19,5,1,0,0,19,30,3,2,1,8,20,21,10,6,
+        0,0,21,22,5,2,0,0,22,30,3,2,1,7,23,24,10,5,0,0,24,25,5,3,0,0,25,
+        30,3,2,1,6,26,27,10,4,0,0,27,28,5,4,0,0,28,30,3,2,1,5,29,17,1,0,
         0,0,29,20,1,0,0,0,29,23,1,0,0,0,29,26,1,0,0,0,30,33,1,0,0,0,31,29,
         1,0,0,0,31,32,1,0,0,0,32,3,1,0,0,0,33,31,1,0,0,0,3,15,29,31
     ]
@@ -131,36 +131,6 @@ class lde_parser ( Parser ):
             super().copyFrom(ctx)
 
 
-    class DivisionContext(ExpresionContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a lde_parser.ExpresionContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def expresion(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(lde_parser.ExpresionContext)
-            else:
-                return self.getTypedRuleContext(lde_parser.ExpresionContext,i)
-
-        def DIV(self):
-            return self.getToken(lde_parser.DIV, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDivision" ):
-                listener.enterDivision(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDivision" ):
-                listener.exitDivision(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitDivision" ):
-                return visitor.visitDivision(self)
-            else:
-                return visitor.visitChildren(self)
-
-
     class SumaContext(ExpresionContext):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a lde_parser.ExpresionContext
@@ -187,6 +157,36 @@ class lde_parser ( Parser ):
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitSuma" ):
                 return visitor.visitSuma(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class DivisionContext(ExpresionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a lde_parser.ExpresionContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def expresion(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(lde_parser.ExpresionContext)
+            else:
+                return self.getTypedRuleContext(lde_parser.ExpresionContext,i)
+
+        def DIV(self):
+            return self.getToken(lde_parser.DIV, 0)
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterDivision" ):
+                listener.enterDivision(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitDivision" ):
+                listener.exitDivision(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDivision" ):
+                return visitor.visitDivision(self)
             else:
                 return visitor.visitChildren(self)
 
@@ -352,7 +352,7 @@ class lde_parser ( Parser ):
                 self.state = 8
                 self.match(lde_parser.RESTA)
                 self.state = 9
-                self.expresion(7)
+                self.expresion(3)
                 pass
             elif token in [5]:
                 localctx = lde_parser.ParenExprContext(self, localctx)
@@ -388,55 +388,55 @@ class lde_parser ( Parser ):
                     self._errHandler.sync(self)
                     la_ = self._interp.adaptivePredict(self._input,1,self._ctx)
                     if la_ == 1:
-                        localctx = lde_parser.MultiplicacionContext(self, lde_parser.ExpresionContext(self, _parentctx, _parentState))
+                        localctx = lde_parser.SumaContext(self, lde_parser.ExpresionContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expresion)
                         self.state = 17
-                        if not self.precpred(self._ctx, 6):
+                        if not self.precpred(self._ctx, 7):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 7)")
                         self.state = 18
-                        self.match(lde_parser.MULT)
+                        self.match(lde_parser.SUMA)
                         self.state = 19
-                        self.expresion(7)
+                        self.expresion(8)
                         pass
 
                     elif la_ == 2:
-                        localctx = lde_parser.DivisionContext(self, lde_parser.ExpresionContext(self, _parentctx, _parentState))
+                        localctx = lde_parser.RestaContext(self, lde_parser.ExpresionContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expresion)
                         self.state = 20
-                        if not self.precpred(self._ctx, 5):
+                        if not self.precpred(self._ctx, 6):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
                         self.state = 21
-                        self.match(lde_parser.DIV)
+                        self.match(lde_parser.RESTA)
                         self.state = 22
-                        self.expresion(6)
+                        self.expresion(7)
                         pass
 
                     elif la_ == 3:
-                        localctx = lde_parser.SumaContext(self, lde_parser.ExpresionContext(self, _parentctx, _parentState))
+                        localctx = lde_parser.MultiplicacionContext(self, lde_parser.ExpresionContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expresion)
                         self.state = 23
-                        if not self.precpred(self._ctx, 4):
+                        if not self.precpred(self._ctx, 5):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 4)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
                         self.state = 24
-                        self.match(lde_parser.SUMA)
+                        self.match(lde_parser.MULT)
                         self.state = 25
-                        self.expresion(5)
+                        self.expresion(6)
                         pass
 
                     elif la_ == 4:
-                        localctx = lde_parser.RestaContext(self, lde_parser.ExpresionContext(self, _parentctx, _parentState))
+                        localctx = lde_parser.DivisionContext(self, lde_parser.ExpresionContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expresion)
                         self.state = 26
-                        if not self.precpred(self._ctx, 3):
+                        if not self.precpred(self._ctx, 4):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 3)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 4)")
                         self.state = 27
-                        self.match(lde_parser.RESTA)
+                        self.match(lde_parser.DIV)
                         self.state = 28
-                        self.expresion(4)
+                        self.expresion(5)
                         pass
 
              
@@ -466,19 +466,19 @@ class lde_parser ( Parser ):
 
     def expresion_sempred(self, localctx:ExpresionContext, predIndex:int):
             if predIndex == 0:
-                return self.precpred(self._ctx, 6)
+                return self.precpred(self._ctx, 7)
          
 
             if predIndex == 1:
-                return self.precpred(self._ctx, 5)
+                return self.precpred(self._ctx, 6)
          
 
             if predIndex == 2:
-                return self.precpred(self._ctx, 4)
+                return self.precpred(self._ctx, 5)
          
 
             if predIndex == 3:
-                return self.precpred(self._ctx, 3)
+                return self.precpred(self._ctx, 4)
          
 
 

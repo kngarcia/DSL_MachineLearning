@@ -14,13 +14,13 @@ class lde_parserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by lde_parser#division.
-    def visitDivision(self, ctx:lde_parser.DivisionContext):
+    # Visit a parse tree produced by lde_parser#suma.
+    def visitSuma(self, ctx:lde_parser.SumaContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by lde_parser#suma.
-    def visitSuma(self, ctx:lde_parser.SumaContext):
+    # Visit a parse tree produced by lde_parser#division.
+    def visitDivision(self, ctx:lde_parser.DivisionContext):
         return self.visitChildren(ctx)
 
 
