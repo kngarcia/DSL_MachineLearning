@@ -8,6 +8,15 @@ else:
 # This class defines a complete listener for a parse tree produced by lde_parser.
 class lde_parserListener(ParseTreeListener):
 
+    # Enter a parse tree produced by lde_parser#programa.
+    def enterPrograma(self, ctx:lde_parser.ProgramaContext):
+        pass
+
+    # Exit a parse tree produced by lde_parser#programa.
+    def exitPrograma(self, ctx:lde_parser.ProgramaContext):
+        pass
+
+
     # Enter a parse tree produced by lde_parser#expresion.
     def enterExpresion(self, ctx:lde_parser.ExpresionContext):
         pass
@@ -41,6 +50,24 @@ class lde_parserListener(ParseTreeListener):
 
     # Exit a parse tree produced by lde_parser#trigonometrica.
     def exitTrigonometrica(self, ctx:lde_parser.TrigonometricaContext):
+        pass
+
+
+    # Enter a parse tree produced by lde_parser#lista.
+    def enterLista(self, ctx:lde_parser.ListaContext):
+        pass
+
+    # Exit a parse tree produced by lde_parser#lista.
+    def exitLista(self, ctx:lde_parser.ListaContext):
+        pass
+
+
+    # Enter a parse tree produced by lde_parser#matriz.
+    def enterMatriz(self, ctx:lde_parser.MatrizContext):
+        pass
+
+    # Exit a parse tree produced by lde_parser#matriz.
+    def exitMatriz(self, ctx:lde_parser.MatrizContext):
         pass
 
 
