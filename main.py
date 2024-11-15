@@ -27,6 +27,7 @@ def completer(text, state):
 readline.set_completer(completer)
 readline.parse_and_bind("tab: complete")
 
+
 # Mensaje de bienvenida
 WELCOME_MESSAGE = Fore.GREEN + "Bienvenido al intérprete de tu DSL. Escribe 'exit' para salir." + Style.RESET_ALL
 

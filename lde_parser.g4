@@ -7,11 +7,11 @@ programa: expresion EOF;
 
 // Reglas para las expresiones aritméticas con niveles de precedencia
 expresion
-    : '-' expresion                  # negativo  // Mayor precedencia para unario
-    | expresion MULT expresion       # multiplicacion
-    | expresion DIV expresion        # division
-    | expresion SUMA expresion       # suma
-    | expresion RESTA expresion      # resta
-    | LPAREN expresion RPAREN        # parenExpr
-    | NUMERO                         # numero
+    : RESTA expresion                  # negativo        // Signo negativo unario, alta precedencia
+    | expresion MULT expresion         # multiplicacion  // Multiplicación
+    | expresion DIV expresion          # division        // División
+    | expresion SUMA expresion         # suma            // Suma binaria
+    | expresion RESTA expresion        # resta           // Resta binaria
+    | LPAREN expresion RPAREN          # parenExpr       // Expresiones entre paréntesis
+    | NUMERO                           # numero         // Números
     ;
