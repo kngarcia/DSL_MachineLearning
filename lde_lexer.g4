@@ -5,6 +5,13 @@ SUMA: '+';
 RESTA: '-';   // Este es el operador de resta tanto binario como unario
 MULT: '*';
 DIV: '/';
+MOD: '%';
+EXP: '^';     // Operador de exponenciación
+
+// Funciones trigonométricas
+SIN: 'sin';
+COS: 'cos';
+TAN: 'tan';
 
 // Paréntesis
 LPAREN: '(';

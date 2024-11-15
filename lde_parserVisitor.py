@@ -9,11 +9,6 @@ else:
 
 class lde_parserVisitor(ParseTreeVisitor):
 
-    # Visit a parse tree produced by lde_parser#programa.
-    def visitPrograma(self, ctx:lde_parser.ProgramaContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by lde_parser#expresion.
     def visitExpresion(self, ctx:lde_parser.ExpresionContext):
         return self.visitChildren(ctx)
@@ -26,6 +21,11 @@ class lde_parserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by lde_parser#factor.
     def visitFactor(self, ctx:lde_parser.FactorContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by lde_parser#trigonometrica.
+    def visitTrigonometrica(self, ctx:lde_parser.TrigonometricaContext):
         return self.visitChildren(ctx)
 
 

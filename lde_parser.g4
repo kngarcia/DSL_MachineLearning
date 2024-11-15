@@ -2,19 +2,12 @@ parser grammar lde_parser;
 
 options { tokenVocab=lde_lexer; }
 
-programa: expresion EOF;
-
-expresion
-    : termino ((SUMA | RESTA) termino)*  // Ahora expresion maneja suma y resta después de termino
-    ;
-
-termino
-    : factor ((MULT | DIV) factor)*     // termino maneja multiplicación y división
-    ;
-
-factor
-    : NUMERO                          // número literal
-    | LPAREN expresion RPAREN          // expresión entre paréntesis
-    | RESTA factor                     // operador unario negativo
-    ;
-
+expresion: termino ((SUMA | RESTA) termino)*;
+termino: factor ((MULT | DIV | MOD | EXP) factor)*;  // Agregar EXP para exponenciación
+factor: NUMERO
+      | LPAREN expresion RPAREN
+      | RESTA factor
+      | trigonometrica
+      ;
+      
+trigonometrica: (SIN | COS | TAN) LPAREN expresion RPAREN;  // Reglas para funciones trigonométricas
