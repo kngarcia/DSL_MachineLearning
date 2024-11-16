@@ -2,11 +2,12 @@ lexer grammar lde_lexer;
 
 // Operadores aritméticos
 SUMA: '+';
-RESTA: '-';   // Este es el operador de resta tanto binario como unario
+RESTA: '-';
 MULT: '*';
 DIV: '/';
 MOD: '%';
-EXP: '^';     // Operador de exponenciación
+EXP: '^';
+PROD: '@';   // Operador para producto punto
 
 // Funciones trigonométricas básicas
 SIN: 'sin';
@@ -24,11 +25,11 @@ TANH: 'tanh';
 // Paréntesis y corchetes
 LPAREN: '(';
 RPAREN: ')';
-LBRACKET: '[';  // Apertura de listas y matrices
-RBRACKET: ']';  // Cierre de listas y matrices
+LBRACKET: '[';
+RBRACKET: ']';
 
 // Separadores
-COMA: ',';  // Separador para elementos de listas y matrices
+COMA: ','; 
 
 // Números (enteros y decimales)
 NUMERO: [0-9]+ ('.' [0-9]+)?;
