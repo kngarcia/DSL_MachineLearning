@@ -1,5 +1,9 @@
 lexer grammar lde_lexer;
 
+// Palabras reservadas
+VAR: 'var';
+WRITE: 'write';
+
 // Operadores aritméticos
 SUMA: '+';
 RESTA: '-';
@@ -8,6 +12,9 @@ DIV: '/';
 MOD: '%';
 EXP: '^';
 PROD: '@';   // Operador para producto punto
+
+// Operadores de asignación
+IGUAL: '=';
 
 // Funciones trigonométricas básicas
 SIN: 'sin';
@@ -30,6 +37,9 @@ RBRACKET: ']';
 
 // Separadores
 COMA: ','; 
+
+// Identificadores para variables
+ID: [a-zA-Z][a-zA-Z0-9]*;
 
 // Números (enteros y decimales)
 NUMERO: [0-9]+ ('.' [0-9]+)?;

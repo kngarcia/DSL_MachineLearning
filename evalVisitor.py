@@ -4,19 +4,31 @@ from lde_parser import lde_parser
 
 
 class evalVisitor(lde_parserVisitor):
-    # Manejo de listas
-    def visitLista(self, ctx: lde_parser.ListaContext):
-        elementos = [self.visit(exp) for exp in ctx.expresion()]
-        return elementos
+    def __init__(self):
+        super().__init__()
+        self.variables = {}  # Diccionario para almacenar las variables
 
-    # Manejo de matrices
-    def visitMatriz(self, ctx: lde_parser.MatrizContext):
-        filas = [self.visit(lista) for lista in ctx.lista()]
-        return filas
-
-    # Manejo de la regla inicial `programa`
+    # Manejo del programa completo
     def visitPrograma(self, ctx: lde_parser.ProgramaContext):
-        return self.visit(ctx.expresion())
+        resultados = []
+        for child in ctx.getChildren():
+            resultado = self.visit(child)
+            if resultado is not None:
+                resultados.append(resultado)
+        return resultados
+
+    # Manejo de declaraciones de variables
+    def visitDeclaracion(self, ctx: lde_parser.DeclaracionContext):
+        nombre = ctx.ID().getText()
+        valor = self.visit(ctx.expresion())
+        self.variables[nombre] = valor
+        return f"Variable '{nombre}' asignada con el valor {valor}."
+
+    # Manejo de la función write
+    def visitWriteStmt(self, ctx: lde_parser.WriteStmtContext):
+        valor = self.visit(ctx.expresion())
+        print(valor)
+        return valor
 
     # Manejo de expresiones
     def visitExpresion(self, ctx: lde_parser.ExpresionContext):
@@ -78,6 +90,12 @@ class evalVisitor(lde_parserVisitor):
         if ctx.NUMERO():
             texto = ctx.NUMERO().getText()
             return float(texto) if '.' in texto else int(texto)
+        elif ctx.ID():
+            nombre = ctx.ID().getText()
+            if nombre in self.variables:
+                return self.variables[nombre]
+            else:
+                raise ValueError(f"Error: La variable '{nombre}' no está definida.")
         elif ctx.expresion():
             return self.visit(ctx.expresion())
         elif ctx.RESTA():

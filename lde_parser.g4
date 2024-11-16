@@ -2,13 +2,18 @@ parser grammar lde_parser;
 
 options { tokenVocab=lde_lexer; }
 
-programa: expresion EOF;
+programa: (declaracion | expresion | writeStmt)* EOF;
+
+declaracion: VAR ID IGUAL expresion;
 
 expresion: termino ((SUMA | RESTA) termino)*;
 
-termino: factor ((MULT | DIV | MOD | EXP | PROD) factor)*; // Agregar PROD para producto punto
+writeStmt: 'write' LPAREN expresion RPAREN;
+
+termino: factor ((MULT | DIV | MOD | EXP | PROD) factor)*;
 
 factor: NUMERO
+      | ID                // Referencias a variables
       | LPAREN expresion RPAREN
       | RESTA factor
       | trigonometrica
