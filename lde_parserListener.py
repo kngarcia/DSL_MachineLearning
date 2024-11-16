@@ -17,12 +17,30 @@ class lde_parserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by lde_parser#declaracion.
+    def enterDeclaracion(self, ctx:lde_parser.DeclaracionContext):
+        pass
+
+    # Exit a parse tree produced by lde_parser#declaracion.
+    def exitDeclaracion(self, ctx:lde_parser.DeclaracionContext):
+        pass
+
+
     # Enter a parse tree produced by lde_parser#expresion.
     def enterExpresion(self, ctx:lde_parser.ExpresionContext):
         pass
 
     # Exit a parse tree produced by lde_parser#expresion.
     def exitExpresion(self, ctx:lde_parser.ExpresionContext):
+        pass
+
+
+    # Enter a parse tree produced by lde_parser#writeStmt.
+    def enterWriteStmt(self, ctx:lde_parser.WriteStmtContext):
+        pass
+
+    # Exit a parse tree produced by lde_parser#writeStmt.
+    def exitWriteStmt(self, ctx:lde_parser.WriteStmtContext):
         pass
 
 

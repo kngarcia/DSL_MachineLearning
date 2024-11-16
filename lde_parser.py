@@ -10,31 +10,38 @@ else:
 
 def serializedATN():
     return [
-        4,1,22,77,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
-        6,1,0,1,0,1,0,1,1,1,1,1,1,5,1,21,8,1,10,1,12,1,24,9,1,1,2,1,2,1,
-        2,5,2,29,8,2,10,2,12,2,32,9,2,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,
-        3,1,3,3,3,44,8,3,1,4,1,4,1,4,1,4,1,4,1,5,1,5,1,5,1,5,5,5,55,8,5,
-        10,5,12,5,58,9,5,3,5,60,8,5,1,5,1,5,1,6,1,6,1,6,1,6,5,6,68,8,6,10,
-        6,12,6,71,9,6,3,6,73,8,6,1,6,1,6,1,6,0,0,7,0,2,4,6,8,10,12,0,3,1,
-        0,1,2,1,0,3,6,1,0,7,15,80,0,14,1,0,0,0,2,17,1,0,0,0,4,25,1,0,0,0,
-        6,43,1,0,0,0,8,45,1,0,0,0,10,50,1,0,0,0,12,63,1,0,0,0,14,15,3,2,
-        1,0,15,16,5,0,0,1,16,1,1,0,0,0,17,22,3,4,2,0,18,19,7,0,0,0,19,21,
-        3,4,2,0,20,18,1,0,0,0,21,24,1,0,0,0,22,20,1,0,0,0,22,23,1,0,0,0,
-        23,3,1,0,0,0,24,22,1,0,0,0,25,30,3,6,3,0,26,27,7,1,0,0,27,29,3,6,
-        3,0,28,26,1,0,0,0,29,32,1,0,0,0,30,28,1,0,0,0,30,31,1,0,0,0,31,5,
-        1,0,0,0,32,30,1,0,0,0,33,44,5,21,0,0,34,35,5,16,0,0,35,36,3,2,1,
-        0,36,37,5,17,0,0,37,44,1,0,0,0,38,39,5,2,0,0,39,44,3,6,3,0,40,44,
-        3,8,4,0,41,44,3,10,5,0,42,44,3,12,6,0,43,33,1,0,0,0,43,34,1,0,0,
-        0,43,38,1,0,0,0,43,40,1,0,0,0,43,41,1,0,0,0,43,42,1,0,0,0,44,7,1,
-        0,0,0,45,46,7,2,0,0,46,47,5,16,0,0,47,48,3,2,1,0,48,49,5,17,0,0,
-        49,9,1,0,0,0,50,59,5,18,0,0,51,56,3,2,1,0,52,53,5,20,0,0,53,55,3,
-        2,1,0,54,52,1,0,0,0,55,58,1,0,0,0,56,54,1,0,0,0,56,57,1,0,0,0,57,
-        60,1,0,0,0,58,56,1,0,0,0,59,51,1,0,0,0,59,60,1,0,0,0,60,61,1,0,0,
-        0,61,62,5,19,0,0,62,11,1,0,0,0,63,72,5,18,0,0,64,69,3,10,5,0,65,
-        66,5,20,0,0,66,68,3,10,5,0,67,65,1,0,0,0,68,71,1,0,0,0,69,67,1,0,
-        0,0,69,70,1,0,0,0,70,73,1,0,0,0,71,69,1,0,0,0,72,64,1,0,0,0,72,73,
-        1,0,0,0,73,74,1,0,0,0,74,75,5,19,0,0,75,13,1,0,0,0,7,22,30,43,56,
-        59,69,72
+        4,1,27,99,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        6,2,7,7,7,2,8,7,8,1,0,1,0,1,0,5,0,22,8,0,10,0,12,0,25,9,0,1,0,1,
+        0,1,1,1,1,1,1,1,1,1,1,1,2,1,2,1,2,5,2,37,8,2,10,2,12,2,40,9,2,1,
+        3,1,3,1,3,1,3,1,3,1,4,1,4,1,4,5,4,50,8,4,10,4,12,4,53,9,4,1,5,1,
+        5,1,5,1,5,1,5,1,5,1,5,1,5,1,5,1,5,1,5,3,5,66,8,5,1,6,1,6,1,6,1,6,
+        1,6,1,7,1,7,1,7,1,7,5,7,77,8,7,10,7,12,7,80,9,7,3,7,82,8,7,1,7,1,
+        7,1,8,1,8,1,8,1,8,5,8,90,8,8,10,8,12,8,93,9,8,3,8,95,8,8,1,8,1,8,
+        1,8,0,0,9,0,2,4,6,8,10,12,14,16,0,3,1,0,3,4,1,0,5,9,1,0,11,19,104,
+        0,23,1,0,0,0,2,28,1,0,0,0,4,33,1,0,0,0,6,41,1,0,0,0,8,46,1,0,0,0,
+        10,65,1,0,0,0,12,67,1,0,0,0,14,72,1,0,0,0,16,85,1,0,0,0,18,22,3,
+        2,1,0,19,22,3,4,2,0,20,22,3,6,3,0,21,18,1,0,0,0,21,19,1,0,0,0,21,
+        20,1,0,0,0,22,25,1,0,0,0,23,21,1,0,0,0,23,24,1,0,0,0,24,26,1,0,0,
+        0,25,23,1,0,0,0,26,27,5,0,0,1,27,1,1,0,0,0,28,29,5,1,0,0,29,30,5,
+        25,0,0,30,31,5,10,0,0,31,32,3,4,2,0,32,3,1,0,0,0,33,38,3,8,4,0,34,
+        35,7,0,0,0,35,37,3,8,4,0,36,34,1,0,0,0,37,40,1,0,0,0,38,36,1,0,0,
+        0,38,39,1,0,0,0,39,5,1,0,0,0,40,38,1,0,0,0,41,42,5,2,0,0,42,43,5,
+        20,0,0,43,44,3,4,2,0,44,45,5,21,0,0,45,7,1,0,0,0,46,51,3,10,5,0,
+        47,48,7,1,0,0,48,50,3,10,5,0,49,47,1,0,0,0,50,53,1,0,0,0,51,49,1,
+        0,0,0,51,52,1,0,0,0,52,9,1,0,0,0,53,51,1,0,0,0,54,66,5,26,0,0,55,
+        66,5,25,0,0,56,57,5,20,0,0,57,58,3,4,2,0,58,59,5,21,0,0,59,66,1,
+        0,0,0,60,61,5,4,0,0,61,66,3,10,5,0,62,66,3,12,6,0,63,66,3,14,7,0,
+        64,66,3,16,8,0,65,54,1,0,0,0,65,55,1,0,0,0,65,56,1,0,0,0,65,60,1,
+        0,0,0,65,62,1,0,0,0,65,63,1,0,0,0,65,64,1,0,0,0,66,11,1,0,0,0,67,
+        68,7,2,0,0,68,69,5,20,0,0,69,70,3,4,2,0,70,71,5,21,0,0,71,13,1,0,
+        0,0,72,81,5,22,0,0,73,78,3,4,2,0,74,75,5,24,0,0,75,77,3,4,2,0,76,
+        74,1,0,0,0,77,80,1,0,0,0,78,76,1,0,0,0,78,79,1,0,0,0,79,82,1,0,0,
+        0,80,78,1,0,0,0,81,73,1,0,0,0,81,82,1,0,0,0,82,83,1,0,0,0,83,84,
+        5,23,0,0,84,15,1,0,0,0,85,94,5,22,0,0,86,91,3,14,7,0,87,88,5,24,
+        0,0,88,90,3,14,7,0,89,87,1,0,0,0,90,93,1,0,0,0,91,89,1,0,0,0,91,
+        92,1,0,0,0,92,95,1,0,0,0,93,91,1,0,0,0,94,86,1,0,0,0,94,95,1,0,0,
+        0,95,96,1,0,0,0,96,97,5,23,0,0,97,17,1,0,0,0,9,21,23,38,51,65,78,
+        81,91,94
     ]
 
 class lde_parser ( Parser ):
@@ -47,50 +54,58 @@ class lde_parser ( Parser ):
 
     sharedContextCache = PredictionContextCache()
 
-    literalNames = [ "<INVALID>", "'+'", "'-'", "'*'", "'/'", "'%'", "'^'", 
-                     "'sin'", "'cos'", "'tan'", "'asin'", "'acos'", "'atan'", 
-                     "'sinh'", "'cosh'", "'tanh'", "'('", "')'", "'['", 
-                     "']'", "','" ]
+    literalNames = [ "<INVALID>", "'var'", "'write'", "'+'", "'-'", "'*'", 
+                     "'/'", "'%'", "'^'", "'@'", "'='", "'sin'", "'cos'", 
+                     "'tan'", "'asin'", "'acos'", "'atan'", "'sinh'", "'cosh'", 
+                     "'tanh'", "'('", "')'", "'['", "']'", "','" ]
 
-    symbolicNames = [ "<INVALID>", "SUMA", "RESTA", "MULT", "DIV", "MOD", 
-                      "EXP", "SIN", "COS", "TAN", "ASIN", "ACOS", "ATAN", 
-                      "SINH", "COSH", "TANH", "LPAREN", "RPAREN", "LBRACKET", 
-                      "RBRACKET", "COMA", "NUMERO", "ESPACIO" ]
+    symbolicNames = [ "<INVALID>", "VAR", "WRITE", "SUMA", "RESTA", "MULT", 
+                      "DIV", "MOD", "EXP", "PROD", "IGUAL", "SIN", "COS", 
+                      "TAN", "ASIN", "ACOS", "ATAN", "SINH", "COSH", "TANH", 
+                      "LPAREN", "RPAREN", "LBRACKET", "RBRACKET", "COMA", 
+                      "ID", "NUMERO", "ESPACIO" ]
 
     RULE_programa = 0
-    RULE_expresion = 1
-    RULE_termino = 2
-    RULE_factor = 3
-    RULE_trigonometrica = 4
-    RULE_lista = 5
-    RULE_matriz = 6
+    RULE_declaracion = 1
+    RULE_expresion = 2
+    RULE_writeStmt = 3
+    RULE_termino = 4
+    RULE_factor = 5
+    RULE_trigonometrica = 6
+    RULE_lista = 7
+    RULE_matriz = 8
 
-    ruleNames =  [ "programa", "expresion", "termino", "factor", "trigonometrica", 
-                   "lista", "matriz" ]
+    ruleNames =  [ "programa", "declaracion", "expresion", "writeStmt", 
+                   "termino", "factor", "trigonometrica", "lista", "matriz" ]
 
     EOF = Token.EOF
-    SUMA=1
-    RESTA=2
-    MULT=3
-    DIV=4
-    MOD=5
-    EXP=6
-    SIN=7
-    COS=8
-    TAN=9
-    ASIN=10
-    ACOS=11
-    ATAN=12
-    SINH=13
-    COSH=14
-    TANH=15
-    LPAREN=16
-    RPAREN=17
-    LBRACKET=18
-    RBRACKET=19
-    COMA=20
-    NUMERO=21
-    ESPACIO=22
+    VAR=1
+    WRITE=2
+    SUMA=3
+    RESTA=4
+    MULT=5
+    DIV=6
+    MOD=7
+    EXP=8
+    PROD=9
+    IGUAL=10
+    SIN=11
+    COS=12
+    TAN=13
+    ASIN=14
+    ACOS=15
+    ATAN=16
+    SINH=17
+    COSH=18
+    TANH=19
+    LPAREN=20
+    RPAREN=21
+    LBRACKET=22
+    RBRACKET=23
+    COMA=24
+    ID=25
+    NUMERO=26
+    ESPACIO=27
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -108,12 +123,29 @@ class lde_parser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def expresion(self):
-            return self.getTypedRuleContext(lde_parser.ExpresionContext,0)
-
-
         def EOF(self):
             return self.getToken(lde_parser.EOF, 0)
+
+        def declaracion(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(lde_parser.DeclaracionContext)
+            else:
+                return self.getTypedRuleContext(lde_parser.DeclaracionContext,i)
+
+
+        def expresion(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(lde_parser.ExpresionContext)
+            else:
+                return self.getTypedRuleContext(lde_parser.ExpresionContext,i)
+
+
+        def writeStmt(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(lde_parser.WriteStmtContext)
+            else:
+                return self.getTypedRuleContext(lde_parser.WriteStmtContext,i)
+
 
         def getRuleIndex(self):
             return lde_parser.RULE_programa
@@ -139,12 +171,100 @@ class lde_parser ( Parser ):
 
         localctx = lde_parser.ProgramaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 0, self.RULE_programa)
+        self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 14
-            self.expresion()
-            self.state = 15
+            self.state = 23
+            self._errHandler.sync(self)
+            _la = self._input.LA(1)
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 106952726) != 0):
+                self.state = 21
+                self._errHandler.sync(self)
+                token = self._input.LA(1)
+                if token in [1]:
+                    self.state = 18
+                    self.declaracion()
+                    pass
+                elif token in [4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 25, 26]:
+                    self.state = 19
+                    self.expresion()
+                    pass
+                elif token in [2]:
+                    self.state = 20
+                    self.writeStmt()
+                    pass
+                else:
+                    raise NoViableAltException(self)
+
+                self.state = 25
+                self._errHandler.sync(self)
+                _la = self._input.LA(1)
+
+            self.state = 26
             self.match(lde_parser.EOF)
+        except RecognitionException as re:
+            localctx.exception = re
+            self._errHandler.reportError(self, re)
+            self._errHandler.recover(self, re)
+        finally:
+            self.exitRule()
+        return localctx
+
+
+    class DeclaracionContext(ParserRuleContext):
+        __slots__ = 'parser'
+
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
+            super().__init__(parent, invokingState)
+            self.parser = parser
+
+        def VAR(self):
+            return self.getToken(lde_parser.VAR, 0)
+
+        def ID(self):
+            return self.getToken(lde_parser.ID, 0)
+
+        def IGUAL(self):
+            return self.getToken(lde_parser.IGUAL, 0)
+
+        def expresion(self):
+            return self.getTypedRuleContext(lde_parser.ExpresionContext,0)
+
+
+        def getRuleIndex(self):
+            return lde_parser.RULE_declaracion
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterDeclaracion" ):
+                listener.enterDeclaracion(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitDeclaracion" ):
+                listener.exitDeclaracion(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDeclaracion" ):
+                return visitor.visitDeclaracion(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+
+
+    def declaracion(self):
+
+        localctx = lde_parser.DeclaracionContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 2, self.RULE_declaracion)
+        try:
+            self.enterOuterAlt(localctx, 1)
+            self.state = 28
+            self.match(lde_parser.VAR)
+            self.state = 29
+            self.match(lde_parser.ID)
+            self.state = 30
+            self.match(lde_parser.IGUAL)
+            self.state = 31
+            self.expresion()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -203,29 +323,93 @@ class lde_parser ( Parser ):
     def expresion(self):
 
         localctx = lde_parser.ExpresionContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 2, self.RULE_expresion)
+        self.enterRule(localctx, 4, self.RULE_expresion)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 17
+            self.state = 33
             self.termino()
-            self.state = 22
+            self.state = 38
             self._errHandler.sync(self)
-            _la = self._input.LA(1)
-            while _la==1 or _la==2:
-                self.state = 18
-                _la = self._input.LA(1)
-                if not(_la==1 or _la==2):
-                    self._errHandler.recoverInline(self)
-                else:
-                    self._errHandler.reportMatch(self)
-                    self.consume()
-                self.state = 19
-                self.termino()
-                self.state = 24
+            _alt = self._interp.adaptivePredict(self._input,2,self._ctx)
+            while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
+                if _alt==1:
+                    self.state = 34
+                    _la = self._input.LA(1)
+                    if not(_la==3 or _la==4):
+                        self._errHandler.recoverInline(self)
+                    else:
+                        self._errHandler.reportMatch(self)
+                        self.consume()
+                    self.state = 35
+                    self.termino() 
+                self.state = 40
                 self._errHandler.sync(self)
-                _la = self._input.LA(1)
+                _alt = self._interp.adaptivePredict(self._input,2,self._ctx)
 
+        except RecognitionException as re:
+            localctx.exception = re
+            self._errHandler.reportError(self, re)
+            self._errHandler.recover(self, re)
+        finally:
+            self.exitRule()
+        return localctx
+
+
+    class WriteStmtContext(ParserRuleContext):
+        __slots__ = 'parser'
+
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
+            super().__init__(parent, invokingState)
+            self.parser = parser
+
+        def WRITE(self):
+            return self.getToken(lde_parser.WRITE, 0)
+
+        def LPAREN(self):
+            return self.getToken(lde_parser.LPAREN, 0)
+
+        def expresion(self):
+            return self.getTypedRuleContext(lde_parser.ExpresionContext,0)
+
+
+        def RPAREN(self):
+            return self.getToken(lde_parser.RPAREN, 0)
+
+        def getRuleIndex(self):
+            return lde_parser.RULE_writeStmt
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterWriteStmt" ):
+                listener.enterWriteStmt(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitWriteStmt" ):
+                listener.exitWriteStmt(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWriteStmt" ):
+                return visitor.visitWriteStmt(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+
+
+    def writeStmt(self):
+
+        localctx = lde_parser.WriteStmtContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 6, self.RULE_writeStmt)
+        try:
+            self.enterOuterAlt(localctx, 1)
+            self.state = 41
+            self.match(lde_parser.WRITE)
+            self.state = 42
+            self.match(lde_parser.LPAREN)
+            self.state = 43
+            self.expresion()
+            self.state = 44
+            self.match(lde_parser.RPAREN)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -273,6 +457,12 @@ class lde_parser ( Parser ):
             else:
                 return self.getToken(lde_parser.EXP, i)
 
+        def PROD(self, i:int=None):
+            if i is None:
+                return self.getTokens(lde_parser.PROD)
+            else:
+                return self.getToken(lde_parser.PROD, i)
+
         def getRuleIndex(self):
             return lde_parser.RULE_termino
 
@@ -296,26 +486,26 @@ class lde_parser ( Parser ):
     def termino(self):
 
         localctx = lde_parser.TerminoContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 4, self.RULE_termino)
+        self.enterRule(localctx, 8, self.RULE_termino)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 25
+            self.state = 46
             self.factor()
-            self.state = 30
+            self.state = 51
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 120) != 0):
-                self.state = 26
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 992) != 0):
+                self.state = 47
                 _la = self._input.LA(1)
-                if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 120) != 0)):
+                if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 992) != 0)):
                     self._errHandler.recoverInline(self)
                 else:
                     self._errHandler.reportMatch(self)
                     self.consume()
-                self.state = 27
+                self.state = 48
                 self.factor()
-                self.state = 32
+                self.state = 53
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
@@ -337,6 +527,9 @@ class lde_parser ( Parser ):
 
         def NUMERO(self):
             return self.getToken(lde_parser.NUMERO, 0)
+
+        def ID(self):
+            return self.getToken(lde_parser.ID, 0)
 
         def LPAREN(self):
             return self.getToken(lde_parser.LPAREN, 0)
@@ -390,50 +583,56 @@ class lde_parser ( Parser ):
     def factor(self):
 
         localctx = lde_parser.FactorContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 6, self.RULE_factor)
+        self.enterRule(localctx, 10, self.RULE_factor)
         try:
-            self.state = 43
+            self.state = 65
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,2,self._ctx)
+            la_ = self._interp.adaptivePredict(self._input,4,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 33
+                self.state = 54
                 self.match(lde_parser.NUMERO)
                 pass
 
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 34
-                self.match(lde_parser.LPAREN)
-                self.state = 35
-                self.expresion()
-                self.state = 36
-                self.match(lde_parser.RPAREN)
+                self.state = 55
+                self.match(lde_parser.ID)
                 pass
 
             elif la_ == 3:
                 self.enterOuterAlt(localctx, 3)
-                self.state = 38
-                self.match(lde_parser.RESTA)
-                self.state = 39
-                self.factor()
+                self.state = 56
+                self.match(lde_parser.LPAREN)
+                self.state = 57
+                self.expresion()
+                self.state = 58
+                self.match(lde_parser.RPAREN)
                 pass
 
             elif la_ == 4:
                 self.enterOuterAlt(localctx, 4)
-                self.state = 40
-                self.trigonometrica()
+                self.state = 60
+                self.match(lde_parser.RESTA)
+                self.state = 61
+                self.factor()
                 pass
 
             elif la_ == 5:
                 self.enterOuterAlt(localctx, 5)
-                self.state = 41
-                self.lista()
+                self.state = 62
+                self.trigonometrica()
                 pass
 
             elif la_ == 6:
                 self.enterOuterAlt(localctx, 6)
-                self.state = 42
+                self.state = 63
+                self.lista()
+                pass
+
+            elif la_ == 7:
+                self.enterOuterAlt(localctx, 7)
+                self.state = 64
                 self.matriz()
                 pass
 
@@ -514,22 +713,22 @@ class lde_parser ( Parser ):
     def trigonometrica(self):
 
         localctx = lde_parser.TrigonometricaContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 8, self.RULE_trigonometrica)
+        self.enterRule(localctx, 12, self.RULE_trigonometrica)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 45
+            self.state = 67
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 65408) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 1046528) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
                 self.consume()
-            self.state = 46
+            self.state = 68
             self.match(lde_parser.LPAREN)
-            self.state = 47
+            self.state = 69
             self.expresion()
-            self.state = 48
+            self.state = 70
             self.match(lde_parser.RPAREN)
         except RecognitionException as re:
             localctx.exception = re
@@ -589,33 +788,33 @@ class lde_parser ( Parser ):
     def lista(self):
 
         localctx = lde_parser.ListaContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 10, self.RULE_lista)
+        self.enterRule(localctx, 14, self.RULE_lista)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 50
+            self.state = 72
             self.match(lde_parser.LBRACKET)
-            self.state = 59
+            self.state = 81
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 2490244) != 0):
-                self.state = 51
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 106952720) != 0):
+                self.state = 73
                 self.expresion()
-                self.state = 56
+                self.state = 78
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while _la==20:
-                    self.state = 52
+                while _la==24:
+                    self.state = 74
                     self.match(lde_parser.COMA)
-                    self.state = 53
+                    self.state = 75
                     self.expresion()
-                    self.state = 58
+                    self.state = 80
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
 
 
 
-            self.state = 61
+            self.state = 83
             self.match(lde_parser.RBRACKET)
         except RecognitionException as re:
             localctx.exception = re
@@ -675,33 +874,33 @@ class lde_parser ( Parser ):
     def matriz(self):
 
         localctx = lde_parser.MatrizContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 12, self.RULE_matriz)
+        self.enterRule(localctx, 16, self.RULE_matriz)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 63
+            self.state = 85
             self.match(lde_parser.LBRACKET)
-            self.state = 72
+            self.state = 94
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==18:
-                self.state = 64
+            if _la==22:
+                self.state = 86
                 self.lista()
-                self.state = 69
+                self.state = 91
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while _la==20:
-                    self.state = 65
+                while _la==24:
+                    self.state = 87
                     self.match(lde_parser.COMA)
-                    self.state = 66
+                    self.state = 88
                     self.lista()
-                    self.state = 71
+                    self.state = 93
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
 
 
 
-            self.state = 74
+            self.state = 96
             self.match(lde_parser.RBRACKET)
         except RecognitionException as re:
             localctx.exception = re

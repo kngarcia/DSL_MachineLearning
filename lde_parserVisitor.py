@@ -14,8 +14,18 @@ class lde_parserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by lde_parser#declaracion.
+    def visitDeclaracion(self, ctx:lde_parser.DeclaracionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by lde_parser#expresion.
     def visitExpresion(self, ctx:lde_parser.ExpresionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by lde_parser#writeStmt.
+    def visitWriteStmt(self, ctx:lde_parser.WriteStmtContext):
         return self.visitChildren(ctx)
 
 
