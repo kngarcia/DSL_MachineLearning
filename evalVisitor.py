@@ -8,14 +8,18 @@ class evalVisitor(lde_parserVisitor):
         super().__init__()
         self.variables = {}  # Diccionario para almacenar las variables
 
+    # Función para verificar si es una matriz válida
+    def es_matriz(self, estructura):
+        return isinstance(estructura, list) and all(isinstance(fila, list) for fila in estructura) and all(len(fila) == len(estructura[0]) for fila in estructura)
+
+    # Función para verificar si es un vector
+    def es_vector(self, estructura):
+        return isinstance(estructura, list) and all(not isinstance(x, list) for x in estructura)
+
     # Manejo del programa completo
     def visitPrograma(self, ctx: lde_parser.ProgramaContext):
-        resultados = []
-        for child in ctx.getChildren():
-            resultado = self.visit(child)
-            if resultado is not None:
-                resultados.append(resultado)
-        return resultados
+        resultados = [self.visit(child) for child in ctx.getChildren()]
+        return [r for r in resultados if r is not None]
 
     # Manejo de declaraciones de variables
     def visitDeclaracion(self, ctx: lde_parser.DeclaracionContext):
@@ -37,15 +41,9 @@ class evalVisitor(lde_parserVisitor):
             operador = ctx.getChild(i * 2 - 1).getText()
             derecha = self.visit(ctx.termino(i))
             if operador == '+':
-                if isinstance(izquierda, list) and isinstance(derecha, list):
-                    izquierda = self.sumar_vectores_o_matrices(izquierda, derecha)
-                else:
-                    izquierda += derecha
+                izquierda = self.sumar_o_restaurar(izquierda, derecha, 'sumar')
             elif operador == '-':
-                if isinstance(izquierda, list) and isinstance(derecha, list):
-                    izquierda = self.restar_vectores_o_matrices(izquierda, derecha)
-                else:
-                    izquierda -= derecha
+                izquierda = self.sumar_o_restaurar(izquierda, derecha, 'restar')
         return izquierda
 
     # Manejo de términos
@@ -55,41 +53,21 @@ class evalVisitor(lde_parserVisitor):
             operador = ctx.getChild(i * 2 - 1).getText()
             derecha = self.visit(ctx.factor(i))
             if operador == '*':
-                if isinstance(izquierda, list) and isinstance(derecha, (int, float)):
-                    izquierda = self.multiplicar_por_escalar(izquierda, derecha)
-                elif isinstance(derecha, list) and isinstance(izquierda, (int, float)):
-                    izquierda = self.multiplicar_por_escalar(derecha, izquierda)
-                elif isinstance(izquierda, list) and isinstance(derecha, list):
-                    izquierda = self.multiplicar_matrices(izquierda, derecha)
-                else:
-                    izquierda *= derecha
+                izquierda = self.multiplicar(izquierda, derecha)
             elif operador == '@':
-                if isinstance(izquierda, list) and isinstance(derecha, list):
-                    izquierda = self.producto_punto(izquierda, derecha)
-                else:
-                    raise ValueError("El operador @ solo se puede usar con vectores.")
+                izquierda = self.producto_punto(izquierda, derecha)
             elif operador == '^':
-                if derecha == -1:
-                    izquierda = self.calcular_inversa(izquierda)
-                elif derecha == 0:
-                    izquierda = self.calcular_transpuesta(izquierda)
-                else:
-                    raise ValueError("El operador ^ solo soporta -1 (inversa) y 0 (transpuesta).")
+                izquierda = self.transponer_o_invertir(izquierda, derecha)
             elif operador == '/':
-                if isinstance(izquierda, list) or isinstance(derecha, list):
-                    raise ValueError("Error: No se puede dividir listas o matrices.")
-                izquierda /= derecha
+                izquierda = self.dividir(izquierda, derecha)
             elif operador == '%':
-                if isinstance(izquierda, list) or isinstance(derecha, list):
-                    raise ValueError("Error: No se puede aplicar módulo a listas o matrices.")
-                izquierda %= derecha
+                izquierda = self.modulo(izquierda, derecha)
         return izquierda
 
     # Manejo de factores
     def visitFactor(self, ctx: lde_parser.FactorContext):
         if ctx.NUMERO():
-            texto = ctx.NUMERO().getText()
-            return float(texto) if '.' in texto else int(texto)
+            return float(ctx.NUMERO().getText()) if '.' in ctx.NUMERO().getText() else int(ctx.NUMERO().getText())
         elif ctx.ID():
             nombre = ctx.ID().getText()
             if nombre in self.variables:
@@ -109,72 +87,62 @@ class evalVisitor(lde_parserVisitor):
         else:
             raise ValueError("Error: Factor no válido.")
 
-    # Manejo de funciones trigonométricas
+    # Funciones trigonométricas
     def visitTrigonometrica(self, ctx: lde_parser.TrigonometricaContext):
         operador = ctx.getChild(0).getText()
         argumento = self.visit(ctx.expresion())
-        if operador == 'sin':
-            return round(math.sin(math.radians(argumento)), 4)
-        elif operador == 'cos':
-            return round(math.cos(math.radians(argumento)), 4)
-        elif operador == 'tan':
-            return round(math.tan(math.radians(argumento)), 4)
-        elif operador == 'asin':
-            return round(math.degrees(math.asin(argumento)), 4)
-        elif operador == 'acos':
-            return round(math.degrees(math.acos(argumento)), 4)
-        elif operador == 'atan':
-            return round(math.degrees(math.atan(argumento)), 4)
-        elif operador == 'sinh':
-            return round(math.sinh(argumento), 4)
-        elif operador == 'cosh':
-            return round(math.cosh(argumento), 4)
-        elif operador == 'tanh':
-            return round(math.tanh(argumento), 4)
+        funciones_trigonometricas = {
+            'sin': math.sin, 'cos': math.cos, 'tan': math.tan,
+            'asin': math.asin, 'acos': math.acos, 'atan': math.atan,
+            'sinh': math.sinh, 'cosh': math.cosh, 'tanh': math.tanh
+        }
+        if operador in funciones_trigonometricas:
+            return round(funciones_trigonometricas[operador](math.radians(argumento)), 4)
         else:
-            raise ValueError("Error: Función trigonométrica no reconocida.")
+            raise ValueError(f"Error: Función trigonométrica no reconocida '{operador}'.")
 
-    # Métodos auxiliares para operaciones con vectores y matrices
-
-    def sumar_vectores_o_matrices(self, a, b):
-        if len(a) != len(b):
-            raise ValueError("Las colecciones no son del mismo tamaño")
-        if all(isinstance(x, list) for x in a) and all(isinstance(y, list) for y in b):  # Matrices
-            return [self.sumar_vectores_o_matrices(x, y) for x, y in zip(a, b)]
-        elif all(not isinstance(x, list) for x in a) and all(not isinstance(y, list) for y in b):  # Vectores
-            return [x + y for x, y in zip(a, b)]
+    # Métodos auxiliares
+    def sumar_o_restaurar(self, a, b, operacion):
+        if self.es_matriz(a) and self.es_matriz(b):
+            return self.sumar_o_restaurar_matrices(a, b, operacion)
+        elif self.es_vector(a) and self.es_vector(b):
+            return self.sumar_o_restaurar_vectores(a, b, operacion)
         else:
-            raise ValueError("Error: No se pueden sumar vectores y matrices juntos.")
+            return a + b if operacion == 'sumar' else a - b
 
-    def restar_vectores_o_matrices(self, a, b):
-        if len(a) != len(b):
-            raise ValueError("Las colecciones no son del mismo tamaño")
-        if all(isinstance(x, list) for x in a) and all(isinstance(y, list) for y in b):  # Matrices
-            return [self.restar_vectores_o_matrices(x, y) for x, y in zip(a, b)]
-        elif all(not isinstance(x, list) for x in a) and all(not isinstance(y, list) for y in b):  # Vectores
-            return [x - y for x, y in zip(a, b)]
+    def sumar_o_restaurar_vectores(self, a, b, operacion):
+        return [x + y for x, y in zip(a, b)] if operacion == 'sumar' else [x - y for x, y in zip(a, b)]
+
+    def sumar_o_restaurar_matrices(self, a, b, operacion):
+        return [self.sumar_o_restaurar(fila_a, fila_b, operacion) for fila_a, fila_b in zip(a, b)]
+
+    def multiplicar(self, a, b):
+        if self.es_matriz(a) and isinstance(b, (int, float)):
+            return self.multiplicar_por_escalar(a, b)
+        elif self.es_vector(a) and isinstance(b, (int, float)):
+            return self.multiplicar_por_escalar(b, a)
+        elif self.es_matriz(a) and self.es_matriz(b):
+            return self.multiplicar_matrices(a, b)
         else:
-            raise ValueError("Error: No se pueden restar vectores y matrices juntos.")
+            return a * b
 
-    def multiplicar_por_escalar(self, matriz, escalar):
-        if all(isinstance(x, list) for x in matriz):  # Matriz
-            return [self.multiplicar_por_escalar(fila, escalar) for fila in matriz]
-        elif all(not isinstance(x, list) for x in matriz):  # Vector
-            return [x * escalar for x in matriz]
+    def dividir(self, a, b):
+        if isinstance(a, list) or isinstance(b, list):
+            raise ValueError("Error: No se puede dividir listas o matrices.")
+        return a / b
+
+    def modulo(self, a, b):
+        if isinstance(a, list) or isinstance(b, list):
+            raise ValueError("Error: No se puede aplicar módulo a listas o matrices.")
+        return a % b
+
+    def transponer_o_invertir(self, a, b):
+        if b == 0:
+            return self.calcular_transpuesta(a)
+        elif b == -1:
+            return self.calcular_inversa(a)
         else:
-            raise ValueError("Error: La multiplicación por escalar solo aplica a vectores o matrices.")
-
-    def multiplicar_matrices(self, A, B):
-        if len(A[0]) != len(B):
-            raise ValueError("El número de columnas de A debe ser igual al número de filas de B.")
-        resultado = []
-        for fila in A:
-            nueva_fila = []
-            for j in range(len(B[0])):
-                suma = sum(fila[k] * B[k][j] for k in range(len(B)))
-                nueva_fila.append(suma)
-            resultado.append(nueva_fila)
-        return resultado
+            raise ValueError("El operador ^ solo soporta -1 (inversa) y 0 (transpuesta).")
 
     def producto_punto(self, A, B):
         if len(A) != len(B):
@@ -182,34 +150,25 @@ class evalVisitor(lde_parserVisitor):
         return sum(x * y for x, y in zip(A, B))
 
     def calcular_transpuesta(self, matriz):
-        if not all(isinstance(row, list) for row in matriz):
+        if not self.es_matriz(matriz):
             raise ValueError("Solo se puede calcular la transpuesta de matrices.")
         return [list(fila) for fila in zip(*matriz)]
 
     def calcular_inversa(self, matriz):
-        if len(matriz) != len(matriz[0]):
+        if not self.es_matriz(matriz) or len(matriz) != len(matriz[0]):
             raise ValueError("Solo las matrices cuadradas tienen inversa.")
-
-        # Crear matriz aumentada (identidad)
         n = len(matriz)
         identidad = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
         matriz = [fila + identidad[i] for i, fila in enumerate(matriz)]
-
-        # Aplicar eliminación gaussiana
         for i in range(n):
-            # Normalizar la fila actual
             pivote = matriz[i][i]
             if pivote == 0:
                 raise ValueError("La matriz no es invertible.")
             for j in range(2 * n):
                 matriz[i][j] /= pivote
-            # Hacer ceros en la columna del pivote
             for k in range(n):
                 if k != i:
                     factor = matriz[k][i]
                     for j in range(2 * n):
                         matriz[k][j] -= factor * matriz[i][j]
-
-        # Extraer la parte derecha (matriz inversa)
-        inversa = [fila[n:] for fila in matriz]
-        return inversa
+        return [fila[n:] for fila in matriz]

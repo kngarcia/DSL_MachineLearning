@@ -31,7 +31,7 @@ readline.parse_and_bind("tab: complete")
 
 
 # Mensaje de bienvenida
-WELCOME_MESSAGE = Fore.GREEN + "Bienvenido al intérprete de tu DSL. Escribe 'exit' para salir." + Style.RESET_ALL
+WELCOME_MESSAGE = Fore.GREEN + "Bienvenido al intérprete. Escribe 'exit' para salir." + Style.RESET_ALL
 
 
 def clear_interpreter():
@@ -91,7 +91,10 @@ def run_repl():
 
             # Evaluar el árbol
             resultado = visitor.visit(tree)
-            print(Fore.CYAN + f"Resultado: {resultado:.4f}" + Style.RESET_ALL)
+            if isinstance(resultado, float):  # Formatear resultados numéricos
+                print(Fore.CYAN + f"Resultado: {resultado:.4f}" + Style.RESET_ALL)
+            else:
+                print(Fore.CYAN + f"Resultado: {resultado}" + Style.RESET_ALL)
 
         except Exception as e:
             print(Fore.RED + f"Error: {e}" + Style.RESET_ALL)
@@ -118,7 +121,7 @@ def run_file(filename, visitor):
             tree = parser.programa()  # Ajusta si la regla inicial es diferente
 
             resultado = visitor.visit(tree)
-            print(Fore.CYAN + f"Resultado del archivo: {resultado:.4f}" + Style.RESET_ALL)
+            print(Fore.CYAN + f"Resultado del archivo: {resultado}" + Style.RESET_ALL)
     except FileNotFoundError:
         print(Fore.RED + f"Archivo no encontrado: {filename}" + Style.RESET_ALL)
     except ValueError as ve:
