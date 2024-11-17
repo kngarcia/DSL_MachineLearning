@@ -111,11 +111,16 @@ class evalVisitor(lde_parserVisitor):
         if self.es_matriz(a) and isinstance(b, (int, float)):
             return self.multiplicar_por_escalar(a, b)
         elif self.es_vector(a) and isinstance(b, (int, float)):
-            return self.multiplicar_por_escalar(b, a)
+            return self.multiplicar_por_escalar(a, b)
         elif self.es_matriz(a) and self.es_matriz(b):
             return self.multiplicar_matrices(a, b)
+        elif isinstance(a, list) and isinstance(b, list):  # Element-wise list multiplication
+            if len(a) != len(b):
+                raise ValueError("Error: Las listas deben tener la misma longitud para multiplicarlas elemento por elemento.")
+            return [x * y for x, y in zip(a, b)]  # Element-wise multiplication of lists
         else:
-            return a * b
+            return a * b  # For scalar multiplication
+
 
     def dividir(self, a, b):
         if isinstance(a, list) or isinstance(b, list):
