@@ -99,13 +99,28 @@ class evalVisitor(lde_parserVisitor):
     def sumar_o_restaurar(self, a, b, operacion):
         if isinstance(a, list) and isinstance(b, list):
             if operacion == 'sumar':
-                # Sumar listas elemento por elemento
-                return [x + y for x, y in zip(a, b)]
+                # Sumar matrices elemento por elemento
+                return [ [x + y for x, y in zip(fila_a, fila_b)] for fila_a, fila_b in zip(a, b)]
             elif operacion == 'restar':
-                # Restar listas elemento por elemento
-                return [x - y for x, y in zip(a, b)]
+                # Restar matrices elemento por elemento
+                return [ [x - y for x, y in zip(fila_a, fila_b)] for fila_a, fila_b in zip(a, b)]
         else:
             return a + b if operacion == 'sumar' else a - b
+
+    def multiplicar_matrices(self, a, b):
+        # Verifica que el número de columnas de 'a' sea igual al número de filas de 'b'
+        if len(a[0]) != len(b):
+            raise ValueError("Error: El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz para multiplicarlas.")
+        
+        # Multiplica las matrices utilizando el producto punto entre filas de 'a' y columnas de 'b'
+        resultado = []
+        for fila_a in a:
+            fila_resultado = []
+            for col_b in zip(*b):
+                fila_resultado.append(sum(x * y for x, y in zip(fila_a, col_b)))
+            resultado.append(fila_resultado)
+        return resultado
+
 
     def multiplicar(self, a, b):
         if self.es_matriz(a) and isinstance(b, (int, float)):
@@ -113,13 +128,14 @@ class evalVisitor(lde_parserVisitor):
         elif self.es_vector(a) and isinstance(b, (int, float)):
             return self.multiplicar_por_escalar(a, b)
         elif self.es_matriz(a) and self.es_matriz(b):
-            return self.multiplicar_matrices(a, b)
+            return self.multiplicar_matrices(a, b)  # Calls the newly added matrix multiplication method
         elif isinstance(a, list) and isinstance(b, list):  # Element-wise list multiplication
             if len(a) != len(b):
                 raise ValueError("Error: Las listas deben tener la misma longitud para multiplicarlas elemento por elemento.")
             return [x * y for x, y in zip(a, b)]  # Element-wise multiplication of lists
         else:
             return a * b  # For scalar multiplication
+
 
 
     def dividir(self, a, b):
