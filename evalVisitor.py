@@ -8,33 +8,27 @@ class evalVisitor(lde_parserVisitor):
         super().__init__()
         self.variables = {}  # Diccionario para almacenar las variables
 
-    # Función para verificar si es una matriz válida
     def es_matriz(self, estructura):
         return isinstance(estructura, list) and all(isinstance(fila, list) for fila in estructura) and all(len(fila) == len(estructura[0]) for fila in estructura)
 
-    # Función para verificar si es un vector
     def es_vector(self, estructura):
         return isinstance(estructura, list) and all(not isinstance(x, list) for x in estructura)
 
-    # Manejo del programa completo
     def visitPrograma(self, ctx: lde_parser.ProgramaContext):
         resultados = [self.visit(child) for child in ctx.getChildren()]
         return [r for r in resultados if r is not None]
 
-    # Manejo de declaraciones de variables
     def visitDeclaracion(self, ctx: lde_parser.DeclaracionContext):
         nombre = ctx.ID().getText()
         valor = self.visit(ctx.expresion())
         self.variables[nombre] = valor
         return f"Variable '{nombre}' asignada con el valor {valor}."
 
-    # Manejo de la función write
     def visitWriteStmt(self, ctx: lde_parser.WriteStmtContext):
         valor = self.visit(ctx.expresion())
         print(valor)
         return valor
 
-    # Manejo de expresiones
     def visitExpresion(self, ctx: lde_parser.ExpresionContext):
         izquierda = self.visit(ctx.termino(0))
         for i in range(1, len(ctx.termino())):
@@ -46,7 +40,6 @@ class evalVisitor(lde_parserVisitor):
                 izquierda = self.sumar_o_restaurar(izquierda, derecha, 'restar')
         return izquierda
 
-    # Manejo de términos
     def visitTermino(self, ctx: lde_parser.TerminoContext):
         izquierda = self.visit(ctx.factor(0))
         for i in range(1, len(ctx.factor())):
@@ -64,7 +57,6 @@ class evalVisitor(lde_parserVisitor):
                 izquierda = self.modulo(izquierda, derecha)
         return izquierda
 
-    # Manejo de factores
     def visitFactor(self, ctx: lde_parser.FactorContext):
         if ctx.NUMERO():
             return float(ctx.NUMERO().getText()) if '.' in ctx.NUMERO().getText() else int(ctx.NUMERO().getText())
@@ -87,7 +79,10 @@ class evalVisitor(lde_parserVisitor):
         else:
             raise ValueError("Error: Factor no válido.")
 
-    # Funciones trigonométricas
+    def visitLista(self, ctx: lde_parser.ListaContext):
+        # Handle list expressions like [1, 2, 3]
+        return [self.visit(exp) for exp in ctx.expresion()]
+
     def visitTrigonometrica(self, ctx: lde_parser.TrigonometricaContext):
         operador = ctx.getChild(0).getText()
         argumento = self.visit(ctx.expresion())
@@ -101,20 +96,16 @@ class evalVisitor(lde_parserVisitor):
         else:
             raise ValueError(f"Error: Función trigonométrica no reconocida '{operador}'.")
 
-    # Métodos auxiliares
     def sumar_o_restaurar(self, a, b, operacion):
-        if self.es_matriz(a) and self.es_matriz(b):
-            return self.sumar_o_restaurar_matrices(a, b, operacion)
-        elif self.es_vector(a) and self.es_vector(b):
-            return self.sumar_o_restaurar_vectores(a, b, operacion)
+        if isinstance(a, list) and isinstance(b, list):
+            if operacion == 'sumar':
+                # Sumar listas elemento por elemento
+                return [x + y for x, y in zip(a, b)]
+            elif operacion == 'restar':
+                # Restar listas elemento por elemento
+                return [x - y for x, y in zip(a, b)]
         else:
             return a + b if operacion == 'sumar' else a - b
-
-    def sumar_o_restaurar_vectores(self, a, b, operacion):
-        return [x + y for x, y in zip(a, b)] if operacion == 'sumar' else [x - y for x, y in zip(a, b)]
-
-    def sumar_o_restaurar_matrices(self, a, b, operacion):
-        return [self.sumar_o_restaurar(fila_a, fila_b, operacion) for fila_a, fila_b in zip(a, b)]
 
     def multiplicar(self, a, b):
         if self.es_matriz(a) and isinstance(b, (int, float)):
