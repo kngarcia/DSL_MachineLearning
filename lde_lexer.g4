@@ -11,7 +11,6 @@ MULT: '*';
 DIV: '/';
 MOD: '%';
 EXP: '^';
-PROD: '@';   // Operador para producto punto
 
 // Operadores de asignación
 IGUAL: '=';

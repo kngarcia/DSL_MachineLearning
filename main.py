@@ -55,7 +55,6 @@ def check_balanced_parentheses(expression):
 def run_repl():
     print(WELCOME_MESSAGE)
     visitor = evalVisitor()
-
     while True:
         try:
             expresion = input(Fore.BLUE + ">>> " + Style.RESET_ALL)
@@ -87,23 +86,34 @@ def run_repl():
             parser.removeErrorListeners()  # Remover listeners por defecto
             parser.addErrorListener(CustomErrorListener())
 
-            tree = parser.expresion()  # Ajusta si la regla inicial es diferente
+            tree = parser.programa()  # Ajusta si la regla inicial es diferente
 
-            # Evaluar el árbol
             resultado = visitor.visit(tree)
-            if isinstance(resultado, float):  # Formatear resultados numéricos
-                print(Fore.CYAN + f"Resultado: {resultado:.4f}" + Style.RESET_ALL)
-            else:
-                print(Fore.CYAN + f"Resultado: {resultado}" + Style.RESET_ALL)
+            if resultado is not None:
+                # Desempaquetar si es una lista con un solo elemento
+                if isinstance(resultado, list) and len(resultado) == 1:
+                    resultado = resultado[0]
 
+                if isinstance(resultado, float):  # Formatear resultados numéricos
+                    print(Fore.CYAN + f"Resultado: {resultado:.4f}" + Style.RESET_ALL)
+                else:
+                    print(Fore.CYAN + f"Resultado: {resultado}" + Style.RESET_ALL)
+
+        except ValueError as ve:
+            print(Fore.RED + f"Error: {ve}" + Style.RESET_ALL)
         except Exception as e:
-            print(Fore.RED + f"Error: {e}" + Style.RESET_ALL)
+            print(Fore.RED + f"Error inesperado: {e}" + Style.RESET_ALL)
+
+
 
 
 def run_file(filename, visitor):
     try:
         if not filename.endswith(".dsl"):
             raise ValueError("El archivo debe tener la extensión '.dsl'")
+
+        # Crear un nuevo evalVisitor para aislar el entorno de ejecución
+        file_visitor = evalVisitor()
 
         with open(filename, "r") as file:
             contenido = file.read()
@@ -120,14 +130,17 @@ def run_file(filename, visitor):
 
             tree = parser.programa()  # Ajusta si la regla inicial es diferente
 
-            resultado = visitor.visit(tree)
-            print(Fore.CYAN + f"Resultado del archivo: {resultado}" + Style.RESET_ALL)
+            # Evaluar el árbol pero no imprimir resultados
+            file_visitor.visit(tree)
+
     except FileNotFoundError:
         print(Fore.RED + f"Archivo no encontrado: {filename}" + Style.RESET_ALL)
     except ValueError as ve:
         print(Fore.RED + f"Error: {ve}" + Style.RESET_ALL)
     except Exception as e:
         print(Fore.RED + f"Error ejecutando archivo: {e}" + Style.RESET_ALL)
+
+
 
 
 if __name__ == "__main__":

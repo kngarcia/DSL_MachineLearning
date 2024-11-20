@@ -23,7 +23,16 @@ class evalVisitor(lde_parserVisitor):
         valor = self.visit(ctx.expresion())
         self.variables[nombre] = valor
         return f"Variable '{nombre}' asignada con el valor {valor}."
-
+    
+    def visitModificacion(self, ctx: lde_parser.ModificacionContext):
+        nombre = ctx.ID().getText()
+        if nombre in self.variables:
+            nuevo_valor = self.visit(ctx.expresion())
+            self.variables[nombre] = nuevo_valor
+            return nuevo_valor
+        else:
+            raise ValueError(f"Error: La variable '{nombre}' no está definida.")
+    
     def visitWriteStmt(self, ctx: lde_parser.WriteStmtContext):
         valor = self.visit(ctx.expresion())
         print(valor)
@@ -47,8 +56,6 @@ class evalVisitor(lde_parserVisitor):
             derecha = self.visit(ctx.factor(i))
             if operador == '*':
                 izquierda = self.multiplicar(izquierda, derecha)
-            elif operador == '@':
-                izquierda = self.producto_punto(izquierda, derecha)
             elif operador == '^':
                 izquierda = self.transponer_o_invertir(izquierda, derecha)
             elif operador == '/':
@@ -123,19 +130,35 @@ class evalVisitor(lde_parserVisitor):
 
 
     def multiplicar(self, a, b):
-        if self.es_matriz(a) and isinstance(b, (int, float)):
+        if self.es_matriz(a) and self.es_matriz(b):
+            return self.multiplicar_matrices(a, b)
+        elif self.es_vector(a) and self.es_vector(b):
+            if len(a) != len(b):
+                raise ValueError("Error: Los vectores deben tener el mismo tamaño para calcular el producto punto.")
+            return self.producto_punto(a, b)
+        elif self.es_matriz(a) and isinstance(b, (int, float)):
             return self.multiplicar_por_escalar(a, b)
         elif self.es_vector(a) and isinstance(b, (int, float)):
             return self.multiplicar_por_escalar(a, b)
-        elif self.es_matriz(a) and self.es_matriz(b):
-            return self.multiplicar_matrices(a, b)  # Calls the newly added matrix multiplication method
-        elif isinstance(a, list) and isinstance(b, list):  # Element-wise list multiplication
+        elif isinstance(a, list) and isinstance(b, list):
+            # Multiplicación elemento a elemento
             if len(a) != len(b):
                 raise ValueError("Error: Las listas deben tener la misma longitud para multiplicarlas elemento por elemento.")
-            return [x * y for x, y in zip(a, b)]  # Element-wise multiplication of lists
+            return [x * y for x, y in zip(a, b)]
         else:
-            return a * b  # For scalar multiplication
+            # Producto normal para escalares
+            return a * b
 
+
+    def multiplicar_por_escalar(self, estructura, escalar):
+        if self.es_vector(estructura):
+            # Multiplica cada elemento del vector por el escalar
+            return [x * escalar for x in estructura]
+        elif self.es_matriz(estructura):
+            # Multiplica cada elemento de la matriz por el escalar
+            return [[x * escalar for x in fila] for fila in estructura]
+        else:
+            raise ValueError("Error: Solo se pueden multiplicar vectores o matrices por un escalar.")
 
 
     def dividir(self, a, b):
@@ -149,12 +172,17 @@ class evalVisitor(lde_parserVisitor):
         return a % b
 
     def transponer_o_invertir(self, a, b):
-        if b == 0:
-            return self.calcular_transpuesta(a)
-        elif b == -1:
-            return self.calcular_inversa(a)
+        if self.es_matriz(a):
+            if b == 0:
+                return self.calcular_transpuesta(a)
+            elif b == -1:
+                return self.calcular_inversa(a)
+            else:
+                raise ValueError("El operador ^ solo soporta -1 (inversa) y 0 (transpuesta) para matrices.")
+        elif isinstance(a, (int, float)) and isinstance(b, (int, float)):
+            return a ** b
         else:
-            raise ValueError("El operador ^ solo soporta -1 (inversa) y 0 (transpuesta).")
+            raise ValueError("Operación no válida para los operandos dados.")
 
     def producto_punto(self, A, B):
         if len(A) != len(B):
