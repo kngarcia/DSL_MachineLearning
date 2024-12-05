@@ -1,5 +1,22 @@
 lexer grammar lde_lexer;
 
+
+IF: 'if';
+ELSE: 'else';
+ELSE_IF: 'else if'; // Alternativamente, podrías usar ELSEIF o manejar 'else if' como una regla en el parser
+
+// Operadores relacionales y lógicos
+MAYOR: '>';
+MENOR: '<';
+MAYOR_IGUAL: '>=';
+MENOR_IGUAL: '<=';
+IGUALDAD: '==';
+DIFERENTE: '!=';
+AND: 'and';
+OR: 'or';
+NOT: 'not';
+
+
 // Palabras reservadas
 VAR: 'var';
 WRITE: 'write';
@@ -33,6 +50,9 @@ LPAREN: '(';
 RPAREN: ')';
 LBRACKET: '[';
 RBRACKET: ']';
+LBRACE: '{';
+RBRACE: '}';
+
 
 // Separadores
 COMA: ','; 
