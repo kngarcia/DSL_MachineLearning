@@ -1,7 +1,11 @@
 import math
 from lde_parserVisitor import lde_parserVisitor
 from lde_parser import lde_parser
+import matplotlib.pyplot as plt
 
+class BreakException(Exception):
+    """Excepción personalizada para manejar 'break'."""
+    pass
 
 class evalVisitor(lde_parserVisitor):
     def __init__(self):
@@ -34,10 +38,32 @@ class evalVisitor(lde_parserVisitor):
             raise ValueError(f"Error: La variable '{nombre}' no está definida.")
     
     def visitWriteStmt(self, ctx: lde_parser.WriteStmtContext):
-        valor = self.visit(ctx.expresion())
+        if ctx.expresion():
+            valor = self.visit(ctx.expresion())
+        elif ctx.relacional():
+            valor = self.visit(ctx.relacional())
+        elif ctx.logico():
+            valor = self.visit(ctx.logico())
+        else:
+            raise ValueError("Error: Tipo de expresión no reconocido en writeStmt.")
+        
         print(valor)
         return valor
-
+    def visitGraficarStmt(self, ctx: lde_parser.GraficarStmtContext):
+        data = self.visit(ctx.expresion())
+        if self.es_vector(data):
+            plt.plot(data)
+            plt.title("Vector")
+            plt.xlabel("Índice")
+            plt.ylabel("Valor")
+        elif self.es_matriz(data):
+            plt.imshow(data, cmap='viridis', aspect='auto')
+            plt.colorbar()
+            plt.title("Matriz")
+        else:
+            raise ValueError("Error: Solo se pueden graficar vectores y matrices.")
+        plt.show()
+        
     def visitExpresion(self, ctx: lde_parser.ExpresionContext):
         izquierda = self.visit(ctx.termino(0))
         for i in range(1, len(ctx.termino())):
@@ -48,7 +74,7 @@ class evalVisitor(lde_parserVisitor):
             elif operador == '-':
                 izquierda = self.sumar_o_restaurar(izquierda, derecha, 'restar')
         return izquierda
-
+    
     def visitTermino(self, ctx: lde_parser.TerminoContext):
         izquierda = self.visit(ctx.factor(0))
         for i in range(1, len(ctx.factor())):
@@ -63,14 +89,122 @@ class evalVisitor(lde_parserVisitor):
             elif operador == '%':
                 izquierda = self.modulo(izquierda, derecha)
         return izquierda
+    
+    def visitIfStmt(self, ctx: lde_parser.IfStmtContext):
+        if ctx.relacional():
+            condicion = self.visit(ctx.relacional())
+        elif ctx.logico():
+            condicion = self.visit(ctx.logico())
+        else:
+            raise ValueError("Error: Tipo de expresión no reconocido en ifStmt.")
+        
+        if condicion:
+            self.visit(ctx.bloque(0))
+        elif ctx.bloque(1):
+            self.visit(ctx.bloque(1))
+    def visitRelacional(self, ctx: lde_parser.RelacionalContext):
+        izquierda = self.visit(ctx.expresion(0))
+        operador = ctx.getChild(1).getText()
+        derecha = self.visit(ctx.expresion(1))
 
+        if operador == '>':
+            return izquierda > derecha
+        elif operador == '<':
+            return izquierda < derecha
+        elif operador == '>=':
+            return izquierda >= derecha
+        elif operador == '<=':
+            return izquierda <= derecha
+        elif operador == '==':
+            return izquierda == derecha
+        elif operador == '!=':
+            return izquierda != derecha
+        else:
+            raise ValueError(f"Operador relacional no reconocido: {operador}")
+    def visitLogico(self, ctx: lde_parser.LogicoContext):
+        if ctx.NOT():
+            return not self.visit(ctx.expresion(0))
+        else:
+            izquierda = self.visit(ctx.expresion(0))
+            operador = ctx.getChild(1).getText()
+            derecha = self.visit(ctx.expresion(1))
+
+            if operador == 'and':
+                return izquierda and derecha
+            elif operador == 'or':
+                return izquierda or derecha
+            else:
+                raise ValueError(f"Operador lógico no reconocido: {operador}")
+            
+    def visitForStmt(self, ctx: lde_parser.ForStmtContext):
+        # Paso 1: Inicialización (opcional)
+        if ctx.declaracion():
+            self.visit(ctx.declaracion())  # Inicializar el iterador
+        elif ctx.ID():
+            iterador = ctx.ID().getText()
+            if iterador not in self.variables:
+                raise ValueError(f"Error: La variable '{iterador}' no está definida.")
+        else:
+            raise ValueError("Error: Falta la inicialización del iterador en forStmt.")
+        
+        # Paso 2: Definir funciones auxiliares
+        def evaluar_condicion():
+            if ctx.relacional():
+                return self.visit(ctx.relacional())
+            elif ctx.logico():
+                return self.visit(ctx.logico())
+            else:
+                raise ValueError("Error: Tipo de condición no reconocido en forStmt.")
+
+        def realizar_incremento():
+            if ctx.modificacion():
+                self.visit(ctx.modificacion())
+            else:
+                raise ValueError("Error: Incremento no especificado en forStmt.")
+
+        # Paso 3: Ejecutar el bucle
+        try:
+            while evaluar_condicion():
+                try:
+                    self.visit(ctx.bloque())  # Ejecutar el cuerpo del bucle
+                except BreakException:
+                    break  # Rompe el bucle
+                realizar_incremento()  # Realizar la modificación al final de cada iteración
+        except BreakException:
+            pass  # Capturar el 'break' si se lanza desde el cuerpo del bucle
+
+    def visitWhileStmt(self, ctx: lde_parser.WhileStmtContext):
+        def evaluar_condicion():
+            if ctx.relacional():
+                return self.visit(ctx.relacional())
+            elif ctx.logico():
+                return self.visit(ctx.logico())
+            else:
+                raise ValueError("Error: Tipo de condición no reconocido en whileStmt.")
+
+        try:
+            while evaluar_condicion():
+                try:
+                    self.visit(ctx.bloque())  # Ejecutar el cuerpo del bucle
+                except BreakException:
+                    break  # Rompe el bucle
+        except BreakException:
+            pass  # Capturar el 'break' si se lanza desde el cuerpo del bucle
+
+    def visitBreakStmt(self, ctx: lde_parser.BreakStmtContext):
+        """Lanza la excepción para romper un bucle."""
+        raise BreakException()
+    
     def visitFactor(self, ctx: lde_parser.FactorContext):
         if ctx.NUMERO():
             return float(ctx.NUMERO().getText()) if '.' in ctx.NUMERO().getText() else int(ctx.NUMERO().getText())
         elif ctx.ID():
             nombre = ctx.ID().getText()
             if nombre in self.variables:
-                return self.variables[nombre]
+                valor = self.variables[nombre]
+                if ctx.acceso():
+                    return self.visitAcceso(ctx.acceso(), valor)
+                return valor
             else:
                 raise ValueError(f"Error: La variable '{nombre}' no está definida.")
         elif ctx.expresion():
@@ -83,8 +217,30 @@ class evalVisitor(lde_parserVisitor):
             return self.visit(ctx.lista())
         elif ctx.matriz():
             return self.visit(ctx.matriz())
+        elif ctx.STRING():
+            return ctx.STRING().getText()[1:-1]  # Eliminar las comillas alrededor del string
+        elif ctx.TRUE():
+            return True
+        elif ctx.FALSE():
+            return False
         else:
             raise ValueError("Error: Factor no válido.")
+
+    def visitAcceso(self, ctx: lde_parser.AccesoContext, valor):
+        if isinstance(valor, list):
+            indice1 = self.visit(ctx.expresion(0))
+            if not isinstance(indice1, int):
+                raise ValueError("Error: El índice debe ser un número entero.")
+            if ctx.expresion(1):
+                if not isinstance(valor[indice1], list):
+                    raise ValueError("Error: El valor no es una matriz.")
+                indice2 = self.visit(ctx.expresion(1))
+                if not isinstance(indice2, int):
+                    raise ValueError("Error: El índice debe ser un número entero.")
+                return valor[indice1][indice2]
+            return valor[indice1]
+        else:
+            raise ValueError("Error: El valor no es una lista o matriz.")
 
     def visitLista(self, ctx: lde_parser.ListaContext):
         # Handle list expressions like [1, 2, 3]
@@ -212,55 +368,3 @@ class evalVisitor(lde_parserVisitor):
                     for j in range(2 * n):
                         matriz[k][j] -= factor * matriz[i][j]
         return [fila[n:] for fila in matriz]
-    
-    def visitCondicional(self, ctx):
-        # Visita la condición del "if"
-        condicion_if = ctx.condicion(0)
-        if condicion_if and self.visit(condicion_if):
-            # Si la condición del "if" es verdadera, ejecuta su bloque
-            return self.visit(ctx.bloque(0))
-        
-        # Itera sobre los "else if"
-        for i in range(len(ctx.ELSE_IF())):
-            condicion_else_if = ctx.condicion(i + 1)  # Empieza después del primer "if"
-            if condicion_else_if and self.visit(condicion_else_if):
-                # Si alguna condición "else if" es verdadera, ejecuta su bloque
-                return self.visit(ctx.bloque(i + 1))
-
-        # Si hay un "else", ejecuta su bloque
-        if ctx.ELSE():
-            return self.visit(ctx.bloque(-1))  # Último bloque es el "else"
-        
-        return None
-
-    def visitCondicion(self, ctx: lde_parser.CondicionContext):
-        if ctx.getChildCount() == 1:
-            # Caso NOT condicion
-            return not self.visit(ctx.condicion(0))
-        elif ctx.getChildCount() == 3:
-            izquierda = self.visit(ctx.expresion(0))
-            derecha = self.visit(ctx.expresion(1))
-            operador = ctx.getChild(1).getText()
-            if operador == '>':
-                return izquierda > derecha
-            elif operador == '<':
-                return izquierda < derecha
-            elif operador == '>=':
-                return izquierda >= derecha
-            elif operador == '<=':
-                return izquierda <= derecha
-            elif operador == '==':
-                return izquierda == derecha
-            elif operador == '!=':
-                return izquierda != derecha
-            elif operador == 'and':
-                return self.visit(ctx.condicion(0)) and self.visit(ctx.condicion(1))
-            elif operador == 'or':
-                return self.visit(ctx.condicion(0)) or self.visit(ctx.condicion(1))
-        else:
-            raise ValueError("Condición no válida.")
-
-    def visitBloque(self, ctx: lde_parser.BloqueContext):
-        resultados = [self.visit(child) for child in ctx.getChildren()]
-        return [r for r in resultados if r is not None]
-

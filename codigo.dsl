@@ -1,5 +1,2 @@
-var x = [[1, 2], [3, 4]]
-var y = [[0, 0], [0, 0]]
-var c = x*y
-var d = x^0
-write(d)
+var a = [[1,2,3,4],[5,6,7,8]]
+plot(a)
