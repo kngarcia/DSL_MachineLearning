@@ -1,3 +1,4 @@
+import csv
 import math
 from lde_parserVisitor import lde_parserVisitor
 from lde_parser import lde_parser
@@ -24,7 +25,10 @@ class evalVisitor(lde_parserVisitor):
 
     def visitDeclaracion(self, ctx: lde_parser.DeclaracionContext):
         nombre = ctx.ID().getText()
-        valor = self.visit(ctx.expresion())
+        if ctx.extraerStmt():
+            valor = self.visit(ctx.extraerStmt())
+        else:
+            valor = self.visit(ctx.expresion())
         self.variables[nombre] = valor
         return f"Variable '{nombre}' asignada con el valor {valor}."
     
@@ -63,7 +67,40 @@ class evalVisitor(lde_parserVisitor):
         else:
             raise ValueError("Error: Solo se pueden graficar vectores y matrices.")
         plt.show()
-        
+    def visitExtraerStmt(self, ctx: lde_parser.ExtraerStmtContext):
+        archivo = ctx.ARCHIVO().getText()[1:-1]  # Eliminar las comillas alrededor del nombre del archivo
+        matriz = []
+
+        with open(archivo, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                fila = []
+                for val in row:
+                    try:
+                        if '.' in val:
+                            fila.append(float(val))
+                        else:
+                            fila.append(int(val))
+                    except ValueError:
+                        fila.append(val)  # Dejar el valor como cadena si no se puede convertir a número
+                matriz.append(fila)
+
+        # Si la matriz tiene solo una fila, devolverla como una lista
+        if len(matriz) == 1:
+            return matriz[0]
+        return matriz
+    def visitExportarStmt(self, ctx: lde_parser.ExportarStmtContext):
+        data = self.visit(ctx.expresion())
+        archivo = ctx.ARCHIVO().getText()[1:-1]  # Eliminar las comillas alrededor del nombre del archivo
+
+        with open(archivo, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            if self.es_matriz(data):
+                writer.writerows(data)
+            elif self.es_vector(data):
+                writer.writerow(data)
+            else:
+                raise ValueError("Error: Solo se pueden exportar vectores y matrices.")
     def visitExpresion(self, ctx: lde_parser.ExpresionContext):
         izquierda = self.visit(ctx.termino(0))
         for i in range(1, len(ctx.termino())):
