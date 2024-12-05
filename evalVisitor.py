@@ -212,3 +212,55 @@ class evalVisitor(lde_parserVisitor):
                     for j in range(2 * n):
                         matriz[k][j] -= factor * matriz[i][j]
         return [fila[n:] for fila in matriz]
+    
+    def visitCondicional(self, ctx):
+        # Visita la condición del "if"
+        condicion_if = ctx.condicion(0)
+        if condicion_if and self.visit(condicion_if):
+            # Si la condición del "if" es verdadera, ejecuta su bloque
+            return self.visit(ctx.bloque(0))
+        
+        # Itera sobre los "else if"
+        for i in range(len(ctx.ELSE_IF())):
+            condicion_else_if = ctx.condicion(i + 1)  # Empieza después del primer "if"
+            if condicion_else_if and self.visit(condicion_else_if):
+                # Si alguna condición "else if" es verdadera, ejecuta su bloque
+                return self.visit(ctx.bloque(i + 1))
+
+        # Si hay un "else", ejecuta su bloque
+        if ctx.ELSE():
+            return self.visit(ctx.bloque(-1))  # Último bloque es el "else"
+        
+        return None
+
+    def visitCondicion(self, ctx: lde_parser.CondicionContext):
+        if ctx.getChildCount() == 1:
+            # Caso NOT condicion
+            return not self.visit(ctx.condicion(0))
+        elif ctx.getChildCount() == 3:
+            izquierda = self.visit(ctx.expresion(0))
+            derecha = self.visit(ctx.expresion(1))
+            operador = ctx.getChild(1).getText()
+            if operador == '>':
+                return izquierda > derecha
+            elif operador == '<':
+                return izquierda < derecha
+            elif operador == '>=':
+                return izquierda >= derecha
+            elif operador == '<=':
+                return izquierda <= derecha
+            elif operador == '==':
+                return izquierda == derecha
+            elif operador == '!=':
+                return izquierda != derecha
+            elif operador == 'and':
+                return self.visit(ctx.condicion(0)) and self.visit(ctx.condicion(1))
+            elif operador == 'or':
+                return self.visit(ctx.condicion(0)) or self.visit(ctx.condicion(1))
+        else:
+            raise ValueError("Condición no válida.")
+
+    def visitBloque(self, ctx: lde_parser.BloqueContext):
+        resultados = [self.visit(child) for child in ctx.getChildren()]
+        return [r for r in resultados if r is not None]
+
