@@ -7,6 +7,8 @@ GRAFICAR: 'plot';
 EXTRAER: 'extract';
 EXPORTAR: 'export';
 ARCHIVO: '\'' [a-zA-Z0-9_/]+ '.' [a-zA-Z0-9]+ '\'';
+REGRESION: 'regression';
+CLASIFICADOR: 'classifier';
 
 // Operadores aritméticos
 SUMA: '+';

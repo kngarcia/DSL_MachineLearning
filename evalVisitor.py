@@ -101,6 +101,28 @@ class evalVisitor(lde_parserVisitor):
                 writer.writerow(data)
             else:
                 raise ValueError("Error: Solo se pueden exportar vectores y matrices.")
+            
+    def visitRegresionLinealStmt(self, ctx: lde_parser.RegresionLinealStmtContext):
+        x = self.visit(ctx.expresion(0))
+        y = self.visit(ctx.expresion(1))
+
+        if not (self.es_vector(x) and self.es_vector(y)):
+            raise ValueError("Error: Los datos de entrada deben ser vectores.")
+
+        if len(x) != len(y):
+            raise ValueError("Error: Los vectores de entrada deben tener la misma longitud.")
+
+        n = len(x)
+        sum_x = sum(x)
+        sum_y = sum(y)
+        sum_x_squared = sum(xi ** 2 for xi in x)
+        sum_xy = sum(xi * yi for xi, yi in zip(x, y))
+
+        # Cálculo de los coeficientes de la regresión lineal
+        m = (n * sum_xy - sum_x * sum_y) / (n * sum_x_squared - sum_x ** 2)
+        b = (sum_y - m * sum_x) / n
+
+        return [m, b]
     def visitExpresion(self, ctx: lde_parser.ExpresionContext):
         izquierda = self.visit(ctx.termino(0))
         for i in range(1, len(ctx.termino())):

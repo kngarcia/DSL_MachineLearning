@@ -2,9 +2,9 @@ parser grammar lde_parser;
 
 options { tokenVocab=lde_lexer; }
 
-programa: (declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt)* EOF;
+programa: (declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt | regresionLinealStmt)* EOF;
 
-declaracion: VAR ID IGUAL (expresion | extraerStmt);
+declaracion: VAR ID IGUAL (expresion | extraerStmt | regresionLinealStmt);
 
 modificacion: ID IGUAL expresion;
 
@@ -26,7 +26,9 @@ whileStmt: 'while' LPAREN (TRUE | FALSE | relacional | logico) RPAREN bloque;
 
 breakStmt: BREAK;
 
-bloque: INBLOCK (declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt)* ENBLOCK;
+regresionLinealStmt: 'regression' LPAREN expresion COMA expresion RPAREN;
+
+bloque: INBLOCK (declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt | regresionLinealStmt)* ENBLOCK;
 
 termino: factor ((MULT | DIV | MOD | EXP) factor)*;
 
