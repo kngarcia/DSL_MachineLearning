@@ -22,7 +22,13 @@ class evalVisitor(lde_parserVisitor):
     def visitPrograma(self, ctx: lde_parser.ProgramaContext):
         resultados = [self.visit(child) for child in ctx.getChildren()]
         return [r for r in resultados if r is not None]
-
+    def visitSizeStmt(self, ctx: lde_parser.SizeStmtContext):
+        valor = self.visit(ctx.factor())
+        
+        if isinstance(valor, list):
+            return len(valor)
+        else:
+            raise ValueError("Error: La función size solo se puede aplicar a listas o matrices.")
     def visitDeclaracion(self, ctx: lde_parser.DeclaracionContext):
         nombre = ctx.ID().getText()
         if ctx.extraerStmt():
