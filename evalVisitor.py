@@ -27,6 +27,8 @@ class evalVisitor(lde_parserVisitor):
         nombre = ctx.ID().getText()
         if ctx.extraerStmt():
             valor = self.visit(ctx.extraerStmt())
+        elif ctx.regresionLinealStmt():
+            valor = self.visit(ctx.regresionLinealStmt())
         else:
             valor = self.visit(ctx.expresion())
         self.variables[nombre] = valor
@@ -34,13 +36,88 @@ class evalVisitor(lde_parserVisitor):
     
     def visitModificacion(self, ctx: lde_parser.ModificacionContext):
         nombre = ctx.ID().getText()
-        if nombre in self.variables:
-            nuevo_valor = self.visit(ctx.expresion())
-            self.variables[nombre] = nuevo_valor
-            return nuevo_valor
-        else:
+        if nombre not in self.variables:
             raise ValueError(f"Error: La variable '{nombre}' no está definida.")
-    
+        
+        # Determina el nuevo valor a asignar
+        if ctx.extraerStmt():
+            nuevo_valor = self.visit(ctx.extraerStmt())
+        elif ctx.regresionLinealStmt():
+            nuevo_valor = self.visit(ctx.regresionLinealStmt())
+        else:
+            nuevo_valor = self.visit(ctx.expresion())
+        
+        # Si hay acceso, manejamos la modificación en niveles internos
+        if ctx.acceso():
+            estructura = self.variables[nombre]
+            if not isinstance(estructura, list):
+                raise ValueError("Error: El valor no es una lista o matriz.")
+            
+            acceso_ctx = ctx.acceso()
+            while acceso_ctx:
+                if acceso_ctx.ROWS():
+                    fila_idx = self.visit(acceso_ctx.expresion())
+                    if not isinstance(fila_idx, int):
+                        raise ValueError("Error: El índice de fila debe ser un número entero.")
+                    if fila_idx < 0 or fila_idx >= len(estructura):
+                        raise IndexError("Error: Índice de fila fuera de rango.")
+                    
+                    # Modifica una fila específica
+                    if acceso_ctx.acceso():
+                        # Modificación a nivel individual en la fila
+                        sub_acceso_ctx = acceso_ctx.acceso()
+                        col_idx = self.visit(sub_acceso_ctx.expresion())
+                        if not isinstance(col_idx, int):
+                            raise ValueError("Error: El índice de columna debe ser un número entero.")
+                        if col_idx < 0 or col_idx >= len(estructura[fila_idx]):
+                            raise IndexError("Error: Índice de columna fuera de rango.")
+                        
+                        # Asigna el nuevo valor
+                        estructura[fila_idx][col_idx] = nuevo_valor
+                    else:
+                        # Modifica toda la fila
+                        if not isinstance(nuevo_valor, list) or len(nuevo_valor) != len(estructura[fila_idx]):
+                            raise ValueError("Error: El nuevo valor no tiene el tamaño correcto para la fila.")
+                        estructura[fila_idx] = nuevo_valor
+                    break
+                
+                elif acceso_ctx.COLUMNS():
+                    col_idx = self.visit(acceso_ctx.expresion())
+                    if not isinstance(col_idx, int):
+                        raise ValueError("Error: El índice de columna debe ser un número entero.")
+                    if col_idx < 0 or col_idx >= len(estructura[0]):
+                        raise IndexError("Error: Índice de columna fuera de rango.")
+                    
+                    # Modifica toda la columna
+                    if not isinstance(nuevo_valor, list) or len(nuevo_valor) != len(estructura):
+                        raise ValueError("Error: El nuevo valor no tiene el tamaño correcto para la columna.")
+                    for i in range(len(estructura)):
+                        estructura[i][col_idx] = nuevo_valor[i]
+                    break
+                
+                else:
+                    # Modificación a nivel individual en la lista/matriz
+                    indice = self.visit(acceso_ctx.expresion())
+                    if not isinstance(indice, int):
+                        raise ValueError("Error: El índice debe ser un número entero.")
+                    if indice < 0 or indice >= len(estructura):
+                        raise IndexError("Error: Índice fuera de rango.")
+                    
+                    if acceso_ctx.acceso():
+                        estructura = estructura[indice]
+                        if not isinstance(estructura, list):
+                            raise ValueError("Error: El valor no es una lista o matriz.")
+                    else:
+                        # Último nivel: actualiza el valor
+                        estructura[indice] = nuevo_valor
+                        break
+                acceso_ctx = acceso_ctx.acceso()
+        else:
+            # Si no hay acceso, reemplaza toda la variable
+            self.variables[nombre] = nuevo_valor
+        
+        return f"Variable '{nombre}' modificada con el valor {nuevo_valor}."
+
     def visitWriteStmt(self, ctx: lde_parser.WriteStmtContext):
         if ctx.expresion():
             valor = self.visit(ctx.expresion())
@@ -330,43 +407,68 @@ class evalVisitor(lde_parserVisitor):
             raise ValueError("Error: Factor no válido.")
 
     def visitAcceso(self, ctx: lde_parser.AccesoContext, valor):
-        if isinstance(valor, list):
+        while ctx is not None:
+            if not isinstance(valor, list):
+                raise ValueError("Error: El valor actual no es una lista o matriz.")
+            
+            # Acceso por filas (R)
             if ctx.ROWS():
-                indice = self.visit(ctx.expresion(0))
+                if not all(isinstance(sublista, list) for sublista in valor):
+                    raise ValueError("Error: El valor no es una matriz.")
+                
+                # Validar acceso posterior (índice requerido)
+                ctx = ctx.acceso()
+                if ctx is None or not ctx.expresion():
+                    raise ValueError("Error: Debe especificarse un índice para 'R'.")
+                
+                indice_fila = self.visit(ctx.expresion())
+                if not isinstance(indice_fila, int):  # El índice debe ser un entero
+                    raise ValueError("Error: El índice de fila debe ser un número entero.")
+                if indice_fila < 0 or indice_fila >= len(valor):  # Índice fuera de rango
+                    raise IndexError("Error: Índice de fila fuera de rango.")
+                
+                # Obtener la fila
+                return valor[indice_fila]
+
+            # Acceso por columnas (C)
+            elif ctx.COLUMNS():
+                if not all(isinstance(sublista, list) for sublista in valor):
+                    raise ValueError("Error: El valor no es una matriz.")
+                
+                # Validar acceso posterior (índice o nombre de columna requerido)
+                ctx = ctx.acceso()
+                if ctx is None or not ctx.expresion():
+                    raise ValueError("Error: Debe especificarse un índice o nombre para 'C'.")
+                
+                indice_columna = self.visit(ctx.expresion())
+                if isinstance(indice_columna, str):  # Acceso por nombre
+                    if not isinstance(valor[0], list) or indice_columna not in valor[0]:
+                        raise ValueError(f"Error: La columna '{indice_columna}' no existe.")
+                    indice_columna = valor[0].index(indice_columna)
+                elif not isinstance(indice_columna, int):  # Acceso por índice
+                    raise ValueError("Error: El índice debe ser un número entero o un nombre de columna.")
+                
+                if indice_columna < 0 or (isinstance(valor[0], list) and indice_columna >= len(valor[0])):
+                    raise IndexError("Error: Índice de columna fuera de rango.")
+                
+                # Obtener la columna
+                return [fila[indice_columna] for fila in valor]
+
+            # Acceso directo por índice
+            else:
+                indice = self.visit(ctx.expresion())
                 if not isinstance(indice, int):
                     raise ValueError("Error: El índice debe ser un número entero.")
                 if indice < 0 or indice >= len(valor):
                     raise IndexError("Error: Índice fuera de rango.")
-                return valor[indice]
-            elif ctx.COLUMNS():
-                indice = self.visit(ctx.expresion(0))
-                if isinstance(indice, str):
-                    # Buscar el índice de la columna por nombre
-                    if not isinstance(valor[0], list):
-                        raise ValueError("Error: El valor no es una matriz.")
-                    if indice not in valor[0]:
-                        raise ValueError(f"Error: La columna '{indice}' no existe.")
-                    indice = valor[0].index(indice)
-                elif not isinstance(indice, int):
-                    raise ValueError("Error: El índice debe ser un número entero o un nombre de columna.")
-                if indice < 0 or (isinstance(valor[0], list) and indice >= len(valor[0])):
-                    raise IndexError("Error: Índice fuera de rango.")
-                return [fila[indice] for fila in valor]
-            else:
-                indice1 = self.visit(ctx.expresion(0))
-                if not isinstance(indice1, int):
-                    raise ValueError("Error: El índice debe ser un número entero.")
-                if ctx.expresion(1):
-                    if not isinstance(valor[indice1], list):
-                        raise ValueError("Error: El valor no es una matriz.")
-                    indice2 = self.visit(ctx.expresion(1))
-                    if not isinstance(indice2, int):
-                        raise ValueError("Error: El índice debe ser un número entero.")
-                    return valor[indice1][indice2]
-                return valor[indice1]
-        else:
-            raise ValueError("Error: El valor no es una lista o matriz.")
+                valor = valor[indice]
+            
+            ctx = ctx.acceso()
         
+        return valor
+
+
+
     def visitAddStmt(self, ctx: lde_parser.AddStmtContext, nombre):
         if nombre not in self.variables:
             raise ValueError(f"Error: La variable '{nombre}' no está definida.")

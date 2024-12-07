@@ -6,7 +6,7 @@ programa: (declaracion | expresion | (relacional | logico) | writeStmt | grafica
 
 declaracion: VAR ID IGUAL (expresion | extraerStmt | regresionLinealStmt);
 
-modificacion: ID IGUAL expresion;
+modificacion: ID acceso? IGUAL (expresion | extraerStmt | regresionLinealStmt);
 
 expresion: termino ((SUMA | RESTA) termino)*;
 
@@ -24,7 +24,7 @@ ifStmt: IF LPAREN (relacional | logico) RPAREN bloque (ELSE bloque)?;
 
 forStmt: 'for' LPAREN (declaracion | ID) COMA (relacional | logico) COMA modificacion RPAREN bloque;
 
-whileStmt: 'while' LPAREN (TRUE | FALSE | relacional | logico) RPAREN bloque;
+whileStmt: 'while' LPAREN (TRUE | relacional | logico) RPAREN bloque;
 
 breakStmt: BREAK;
 
@@ -46,7 +46,7 @@ factor: NUMERO
       | FALSE
       ;
 
-acceso: LBRACKET (expresion | ROWS | COLUMNS) RBRACKET (LBRACKET expresion RBRACKET)?;
+acceso: LBRACKET (expresion | ROWS | COLUMNS) RBRACKET acceso?;
 
 addStmt: PUNTO 'add' LPAREN (ROWS | COLUMNS) COMA expresion RPAREN;
 
