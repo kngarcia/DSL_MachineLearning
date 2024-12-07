@@ -54,19 +54,59 @@ class evalVisitor(lde_parserVisitor):
         print(valor)
         return valor
     def visitGraficarStmt(self, ctx: lde_parser.GraficarStmtContext):
-        data = self.visit(ctx.expresion())
-        if self.es_vector(data):
-            plt.plot(data)
-            plt.title("Vector")
-            plt.xlabel("Índice")
+        tipo_grafico = ctx.tipoGrafico().getText()
+        x = self.visit(ctx.expresion(0))
+        y = self.visit(ctx.expresion(1)) if ctx.expresion(1) else None
+
+        # Validación inicial
+        if not self.es_vector(x) and tipo_grafico != 'heatmap':
+            raise ValueError(f"Error: El argumento x debe ser un vector para '{tipo_grafico}'.")
+
+        if tipo_grafico in ['scatter_plot', 'scatter_density', 'line_plot'] and y is None:
+            raise ValueError(f"Error: El gráfico '{tipo_grafico}' requiere dos vectores (x, y).")
+
+        # Crear gráfico
+        if tipo_grafico == 'bar_plot':
+            plt.bar(x, y if y else range(len(x)))  # Si y es None, usar índices como valores
+            plt.title("Gráfico de Barras")
+            plt.xlabel("Categoría")
             plt.ylabel("Valor")
-        elif self.es_matriz(data):
-            plt.imshow(data, cmap='viridis', aspect='auto')
+        elif tipo_grafico == 'histogram':
+            plt.hist(x, bins='auto')
+            plt.title("Histograma")
+            plt.xlabel("Valor")
+            plt.ylabel("Frecuencia")
+        elif tipo_grafico == 'scatter_plot':
+            if not self.es_vector(y):
+                raise ValueError("Error: Ambos argumentos deben ser vectores para 'scatter_plot'.")
+            plt.scatter(x, y)
+            plt.title("Gráfico de Dispersión")
+            plt.xlabel("X")
+            plt.ylabel("Y")
+        elif tipo_grafico == 'scatter_density':
+            if not self.es_vector(y):
+                raise ValueError("Error: Ambos argumentos deben ser vectores para 'scatter_density'.")
+            plt.hexbin(x, y, gridsize=30, cmap='Blues')
             plt.colorbar()
-            plt.title("Matriz")
+            plt.title("Gráfico de Densidad de Dispersión")
+            plt.xlabel("X")
+            plt.ylabel("Y")
+        elif tipo_grafico == 'line_plot':
+            plt.plot(x, y if y else range(len(x)))  # Si y es None, usar índices como valores
+            plt.title("Gráfico de Líneas")
+            plt.xlabel("X")
+            plt.ylabel("Valor")
+        elif tipo_grafico == 'heatmap':
+            if not self.es_matriz(x):
+                raise ValueError("Error: El argumento x debe ser una matriz para 'heatmap'.")
+            plt.imshow(x, cmap='viridis', aspect='auto')
+            plt.colorbar()
+            plt.title("Mapa de Calor")
         else:
-            raise ValueError("Error: Solo se pueden graficar vectores y matrices.")
+            raise ValueError(f"Error: Tipo de gráfico '{tipo_grafico}' no reconocido.")
+
         plt.show()
+
     def visitExtraerStmt(self, ctx: lde_parser.ExtraerStmtContext):
         archivo = ctx.ARCHIVO().getText()[1:-1]  # Eliminar las comillas alrededor del nombre del archivo
         matriz = []
@@ -263,6 +303,10 @@ class evalVisitor(lde_parserVisitor):
                 valor = self.variables[nombre]
                 if ctx.acceso():
                     return self.visitAcceso(ctx.acceso(), valor)
+                elif ctx.addStmt():
+                    return self.visitAddStmt(ctx.addStmt(), nombre)  # Pasamos el nombre
+                elif ctx.delStmt():
+                    return self.visitDelStmt(ctx.delStmt(), nombre)  # Pasamos el nombre
                 return valor
             else:
                 raise ValueError(f"Error: La variable '{nombre}' no está definida.")
@@ -287,20 +331,108 @@ class evalVisitor(lde_parserVisitor):
 
     def visitAcceso(self, ctx: lde_parser.AccesoContext, valor):
         if isinstance(valor, list):
-            indice1 = self.visit(ctx.expresion(0))
-            if not isinstance(indice1, int):
-                raise ValueError("Error: El índice debe ser un número entero.")
-            if ctx.expresion(1):
-                if not isinstance(valor[indice1], list):
-                    raise ValueError("Error: El valor no es una matriz.")
-                indice2 = self.visit(ctx.expresion(1))
-                if not isinstance(indice2, int):
+            if ctx.ROWS():
+                indice = self.visit(ctx.expresion(0))
+                if not isinstance(indice, int):
                     raise ValueError("Error: El índice debe ser un número entero.")
-                return valor[indice1][indice2]
-            return valor[indice1]
+                if indice < 0 or indice >= len(valor):
+                    raise IndexError("Error: Índice fuera de rango.")
+                return valor[indice]
+            elif ctx.COLUMNS():
+                indice = self.visit(ctx.expresion(0))
+                if isinstance(indice, str):
+                    # Buscar el índice de la columna por nombre
+                    if not isinstance(valor[0], list):
+                        raise ValueError("Error: El valor no es una matriz.")
+                    if indice not in valor[0]:
+                        raise ValueError(f"Error: La columna '{indice}' no existe.")
+                    indice = valor[0].index(indice)
+                elif not isinstance(indice, int):
+                    raise ValueError("Error: El índice debe ser un número entero o un nombre de columna.")
+                if indice < 0 or (isinstance(valor[0], list) and indice >= len(valor[0])):
+                    raise IndexError("Error: Índice fuera de rango.")
+                return [fila[indice] for fila in valor]
+            else:
+                indice1 = self.visit(ctx.expresion(0))
+                if not isinstance(indice1, int):
+                    raise ValueError("Error: El índice debe ser un número entero.")
+                if ctx.expresion(1):
+                    if not isinstance(valor[indice1], list):
+                        raise ValueError("Error: El valor no es una matriz.")
+                    indice2 = self.visit(ctx.expresion(1))
+                    if not isinstance(indice2, int):
+                        raise ValueError("Error: El índice debe ser un número entero.")
+                    return valor[indice1][indice2]
+                return valor[indice1]
         else:
             raise ValueError("Error: El valor no es una lista o matriz.")
+        
+    def visitAddStmt(self, ctx: lde_parser.AddStmtContext, nombre):
+        if nombre not in self.variables:
+            raise ValueError(f"Error: La variable '{nombre}' no está definida.")
+        
+        valor = self.variables[nombre]
+        if not isinstance(valor, list):
+            raise ValueError("Error: El valor debe ser una lista o matriz.")
+        
+        datos = self.visit(ctx.expresion())
+        if not isinstance(datos, list):
+            raise ValueError("Error: Los datos a agregar deben ser una lista.")
+        
+        if ctx.ROWS():  # Añadir una fila
+            if any(not isinstance(fila, list) for fila in valor):
+                raise ValueError("Error: El valor debe ser una matriz para agregar filas.")
+            if len(datos) != len(valor[0]):
+                raise ValueError("Error: La fila a agregar debe tener el mismo número de columnas.")
+            valor.append(datos)
+        
+        elif ctx.COLUMNS():  # Añadir una columna
+            if any(not isinstance(fila, list) for fila in valor):
+                raise ValueError("Error: El valor debe ser una matriz para agregar columnas.")
+            if len(datos) != len(valor):
+                raise ValueError("Error: La columna a agregar debe tener el mismo número de filas.")
+            for i, fila in enumerate(valor):
+                fila.append(datos[i])
+        
+        else:
+            raise ValueError("Error: Se debe especificar si se agrega una fila (ROWS) o una columna (COLUMNS).")
+        
+        self.variables[nombre] = valor
 
+    
+    def visitDelStmt(self, ctx: lde_parser.DelStmtContext, nombre):
+        if nombre not in self.variables:
+            raise ValueError(f"Error: La variable '{nombre}' no está definida.")
+        
+        valor = self.variables[nombre]
+        if not isinstance(valor, list):
+            raise ValueError("Error: El valor debe ser una lista o matriz.")
+        
+        indice = self.visit(ctx.expresion())
+        if ctx.ROWS():
+            if not all(isinstance(fila, list) for fila in valor):
+                raise ValueError("Error: No se puede eliminar una fila porque el valor no es una matriz.")
+            if not isinstance(indice, int) or indice < 0 or indice >= len(valor):
+                raise IndexError("Error: Índice fuera de rango al eliminar fila.")
+            del valor[indice]
+        elif ctx.COLUMNS():
+            if isinstance(indice, str):
+                if not all(isinstance(fila, list) for fila in valor) or not valor:
+                    raise ValueError("Error: El valor no es una matriz válida para nombres de columnas.")
+                if indice not in valor[0]:
+                    raise ValueError(f"Error: La columna '{indice}' no existe.")
+                indice = valor[0].index(indice)
+            if not isinstance(indice, int) or indice < 0 or not all(len(fila) > indice for fila in valor):
+                raise IndexError("Error: Índice fuera de rango al eliminar columna.")
+            for fila in valor:
+                del fila[indice]
+        else:
+            raise ValueError("Error: Se debe especificar si se elimina una fila o una columna.")
+        
+        self.variables[nombre] = valor
+
+
+    
     def visitLista(self, ctx: lde_parser.ListaContext):
         # Handle list expressions like [1, 2, 3]
         return [self.visit(exp) for exp in ctx.expresion()]

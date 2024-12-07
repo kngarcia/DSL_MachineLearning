@@ -12,7 +12,9 @@ expresion: termino ((SUMA | RESTA) termino)*;
 
 writeStmt: 'write' LPAREN (expresion | relacional | logico) RPAREN;
 
-graficarStmt: 'plot' LPAREN expresion RPAREN;
+graficarStmt: 'plot' LPAREN tipoGrafico COMA expresion (COMA expresion)? RPAREN;
+
+tipoGrafico: BARRASPLOT | HISTOGRAMA | SCATTERPLOT | SCATTERDENS | LINEASPLOT | HEATMAP;
 
 extraerStmt: 'extract' LPAREN ARCHIVO RPAREN;
 
@@ -33,7 +35,7 @@ bloque: INBLOCK (declaracion | expresion | (relacional | logico) | writeStmt | g
 termino: factor ((MULT | DIV | MOD | EXP) factor)*;
 
 factor: NUMERO
-      | ID acceso?                // Referencias a variables con acceso opcional a elementos
+      | ID (acceso | addStmt | delStmt)?                // Referencias a variables con acceso opcional a elementos
       | LPAREN expresion RPAREN
       | RESTA factor
       | trigonometrica
@@ -44,7 +46,11 @@ factor: NUMERO
       | FALSE
       ;
 
-acceso: LBRACKET expresion RBRACKET (LBRACKET expresion RBRACKET)?;
+acceso: LBRACKET (expresion | ROWS | COLUMNS) RBRACKET (LBRACKET expresion RBRACKET)?;
+
+addStmt: PUNTO 'add' LPAREN (ROWS | COLUMNS) COMA expresion RPAREN;
+
+delStmt: PUNTO 'del' LPAREN (ROWS | COLUMNS) COMA expresion RPAREN;
 
 trigonometrica: (SIN | COS | TAN | ASIN | ACOS | ATAN | SINH | COSH | TANH) LPAREN expresion RPAREN;
 

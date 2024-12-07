@@ -9,7 +9,16 @@ EXPORTAR: 'export';
 ARCHIVO: '\'' [a-zA-Z0-9_/]+ '.' [a-zA-Z0-9]+ '\'';
 REGRESION: 'regression';
 CLASIFICADOR: 'classifier';
+ROWS: 'R';
+COLUMNS: 'C';
 
+//
+BARRASPLOT: 'bar_plot';
+HISTOGRAMA: 'histogram';
+SCATTERPLOT: 'scatter_plot';
+SCATTERDENS: 'scatter_density';
+LINEASPLOT: 'line_plot';
+HEATMAP: 'heatmap';
 // Operadores aritméticos
 SUMA: '+';
 RESTA: '-';
@@ -39,6 +48,8 @@ LPAREN: '(';
 RPAREN: ')';
 LBRACKET: '[';
 RBRACKET: ']';
+ADD: 'add';
+DEL: 'del';
 //CONDICIONALES
 IF: 'if';
 ELSE: 'else';
@@ -63,6 +74,7 @@ WHILE: 'while';
 BREAK: 'break';
 // Separadores
 COMA: ','; 
+PUNTO: '.';
 // Identificadores para variables
 ID: [a-zA-Z][a-zA-Z0-9]*;
 
