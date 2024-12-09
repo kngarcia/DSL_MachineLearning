@@ -1,9 +1,13 @@
-import csv
-import math
+import math, csv,random
 from lde_parserVisitor import lde_parserVisitor
 from lde_parser import lde_parser
 import matplotlib.pyplot as plt
+from multilayer_perceptron import MultiLayerPerceptron
+from cluster import KMeans
 
+class BreakException(Exception):
+    """Excepción personalizada para manejar 'break'."""
+    pass
 class BreakException(Exception):
     """Excepción personalizada para manejar 'break'."""
     pass
@@ -35,6 +39,14 @@ class evalVisitor(lde_parserVisitor):
             valor = self.visit(ctx.extraerStmt())
         elif ctx.regresionLinealStmt():
             valor = self.visit(ctx.regresionLinealStmt())
+        elif ctx.funcionAct():
+            valor = self.visit(ctx.funcionAct())
+        elif ctx.classificadorStmt():
+            valor = self.visit(ctx.classificadorStmt())
+        elif ctx.predecirStmt():
+            valor = self.visit(ctx.predecirStmt())
+        elif ctx.agruparStmt():
+            valor = self.visit(ctx.agruparStmt())
         else:
             valor = self.visit(ctx.expresion())
         self.variables[nombre] = valor
@@ -50,6 +62,14 @@ class evalVisitor(lde_parserVisitor):
             nuevo_valor = self.visit(ctx.extraerStmt())
         elif ctx.regresionLinealStmt():
             nuevo_valor = self.visit(ctx.regresionLinealStmt())
+        elif ctx.funcionAct():
+            nuevo_valor = self.visit(ctx.funcionAct())
+        elif ctx.classificadorStmt():
+            nuevo_valor = self.visit(ctx.classificadorStmt())
+        elif ctx.predecirStmt():
+            nuevo_valor = self.visit(ctx.predecirStmt())
+        elif ctx.agruparStmt():
+            nuevo_valor = self.visit(ctx.agruparStmt())
         else:
             nuevo_valor = self.visit(ctx.expresion())
         
@@ -58,7 +78,6 @@ class evalVisitor(lde_parserVisitor):
             estructura = self.variables[nombre]
             if not isinstance(estructura, list):
                 raise ValueError("Error: El valor no es una lista o matriz.")
-            
             acceso_ctx = ctx.acceso()
             while acceso_ctx:
                 if acceso_ctx.ROWS():
@@ -102,7 +121,6 @@ class evalVisitor(lde_parserVisitor):
                     break
                 
                 else:
-                    # Modificación a nivel individual en la lista/matriz
                     indice = self.visit(acceso_ctx.expresion())
                     if not isinstance(indice, int):
                         raise ValueError("Error: El índice debe ser un número entero.")
@@ -123,7 +141,6 @@ class evalVisitor(lde_parserVisitor):
             self.variables[nombre] = nuevo_valor
         
         return f"Variable '{nombre}' modificada con el valor {nuevo_valor}."
-
     def visitWriteStmt(self, ctx: lde_parser.WriteStmtContext):
         if ctx.expresion():
             valor = self.visit(ctx.expresion())
@@ -245,7 +262,98 @@ class evalVisitor(lde_parserVisitor):
         m = (n * sum_xy - sum_x * sum_y) / (n * sum_x_squared - sum_x ** 2)
         b = (sum_y - m * sum_x) / n
 
-        return [m, b]
+        # Predicciones
+        y_pred = [m * xi + b for xi in x]
+
+        # Cálculo del Error Cuadrático Medio (MSE)
+        mse = sum((yi - y_pred_i) ** 2 for yi, y_pred_i in zip(y, y_pred)) / n
+
+        # Cálculo del Coeficiente de Determinación (R^2)
+        y_mean = sum_y / n
+        sse = sum((yi - y_pred_i) ** 2 for yi, y_pred_i in zip(y, y_pred))
+        sst = sum((yi - y_mean) ** 2 for yi in y)
+        r_squared = 1 - (sse / sst)
+
+        # Cálculo del Error Estándar de la Pendiente (SE_m)
+        se_m = (sse / (n - 2)) ** 0.5 / sum((xi - sum_x / n) ** 2 for xi in x) ** 0.5
+
+        # Mostrar el gráfico de la regresión lineal
+        plt.scatter(x, y, color='blue', label='Datos')
+        plt.plot(x, y_pred, color='red', label='Regresión lineal')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.title('Regresión Lineal')
+        plt.legend()
+        plt.show()
+
+        # Retornar los resultados como una lista
+        return [m, b, mse, r_squared, se_m]
+
+    def visitClassificadorStmt(self, ctx: lde_parser.ClassificadorStmtContext):
+        X = self.visit(ctx.expresion(0))
+        y = self.visit(ctx.expresion(1))
+        layers = self.visit(ctx.expresion(2))
+        activation_function = ctx.funcionAct().getText()
+        learning_rate = self.visit(ctx.expresion(3))
+        epochs = self.visit(ctx.expresion(4))
+
+        if not (self.es_matriz(X) and (self.es_vector(y) or self.es_matriz(y))):
+            raise ValueError("Error: Los datos de entrada deben ser una matriz y un vector o matriz.")
+
+        if len(X) != len(y):
+            raise ValueError("Error: La matriz de entrada y las etiquetas deben tener la misma longitud.")
+
+        # Si se utiliza softmax, convertir y a codificación one-hot
+        if activation_function.lower() == 'softmax':
+            num_classes = int(max(y)) + 1
+            y_one_hot = []
+            for label in y:
+                one_hot = [0] * num_classes
+                one_hot[int(label)] = 1
+                y_one_hot.append(one_hot)
+            y = y_one_hot
+
+        mlp = MultiLayerPerceptron(X, y, layers, activation_function, learning_rate, epochs)
+        mlp.train()
+
+        return mlp
+    def visitPredecirStmt(self, ctx: lde_parser.PredecirStmtContext):
+        nombre = ctx.ID().getText()
+        if nombre not in self.variables:
+            raise ValueError(f"Error: La variable '{nombre}' no está definida.")
+        
+        modelo = self.variables[nombre]
+        if not isinstance(modelo, MultiLayerPerceptron):
+            raise ValueError(f"Error: La variable '{nombre}' no es un modelo entrenado.")
+        
+        datos_nuevos = self.visit(ctx.expresion())
+        predicciones = modelo.predict(datos_nuevos)
+        
+        return predicciones
+    def visitAgruparStmt(self, ctx: lde_parser.AgruparStmtContext):
+        # Obtener datos y número de clusters desde el contexto
+        data = self.visit(ctx.expresion(0))
+        k = self.visit(ctx.expresion(1))
+
+        # Validar que los datos sean una matriz
+        if not self.es_matriz(data):
+            raise ValueError("Error: Los datos de entrada deben ser una matriz.")
+        
+        # Validar que k sea un entero positivo
+        if not isinstance(k, int) or k <= 0:
+            raise ValueError("Error: El número de clusters debe ser un entero positivo.")
+
+        # Crear y entrenar el modelo KMeans
+        kmeans = KMeans(k)
+        kmeans.fit(data)
+
+        # Generar el gráfico
+        kmeans.plot_clusters(data)
+
+        # Obtener los clusters predichos
+        clusters = kmeans.predict(data)
+
+        return clusters
     def visitExpresion(self, ctx: lde_parser.ExpresionContext):
         izquierda = self.visit(ctx.termino(0))
         for i in range(1, len(ctx.termino())):
@@ -357,7 +465,9 @@ class evalVisitor(lde_parserVisitor):
 
     def visitWhileStmt(self, ctx: lde_parser.WhileStmtContext):
         def evaluar_condicion():
-            if ctx.relacional():
+            if ctx.TRUE():
+                return True
+            elif ctx.relacional():
                 return self.visit(ctx.relacional())
             elif ctx.logico():
                 return self.visit(ctx.logico())
@@ -480,30 +590,44 @@ class evalVisitor(lde_parserVisitor):
             raise ValueError(f"Error: La variable '{nombre}' no está definida.")
         
         valor = self.variables[nombre]
-        if not isinstance(valor, list):
-            raise ValueError("Error: El valor debe ser una lista o matriz.")
-        
         datos = self.visit(ctx.expresion())
-        if not isinstance(datos, list):
-            raise ValueError("Error: Los datos a agregar deben ser una lista.")
-        
+
         if ctx.ROWS():  # Añadir una fila
-            if any(not isinstance(fila, list) for fila in valor):
+            if not isinstance(valor, list) or any(not isinstance(fila, list) for fila in valor):
                 raise ValueError("Error: El valor debe ser una matriz para agregar filas.")
+            if not isinstance(datos, list):
+                raise ValueError("Error: Los datos a agregar deben ser una lista para agregar una fila.")
             if len(datos) != len(valor[0]):
                 raise ValueError("Error: La fila a agregar debe tener el mismo número de columnas.")
             valor.append(datos)
         
         elif ctx.COLUMNS():  # Añadir una columna
-            if any(not isinstance(fila, list) for fila in valor):
-                raise ValueError("Error: El valor debe ser una matriz para agregar columnas.")
-            if len(datos) != len(valor):
-                raise ValueError("Error: La columna a agregar debe tener el mismo número de filas.")
-            for i, fila in enumerate(valor):
-                fila.append(datos[i])
+            if isinstance(valor, list) and all(isinstance(elem, list) for elem in valor):
+                # El valor es una matriz
+                if isinstance(datos, list):
+                    if len(datos) != len(valor):
+                        raise ValueError("Error: La columna a agregar debe tener el mismo número de filas.")
+                    for i, fila in enumerate(valor):
+                        fila.append(datos[i])
+                else:
+                    for fila in valor:
+                        fila.append(datos)
+            elif isinstance(valor, list):
+                # El valor es una lista
+                if isinstance(datos, list):
+                    valor.extend(datos)
+                else:
+                    valor.append(datos)
+            else:
+                raise ValueError("Error: El valor debe ser una lista o matriz para agregar columnas.")
         
-        else:
-            raise ValueError("Error: Se debe especificar si se agrega una fila (ROWS) o una columna (COLUMNS).")
+        else:  # Añadir un valor a una lista
+            if isinstance(valor, list) and all(isinstance(elem, list) for elem in valor):
+                raise ValueError("Error: Se debe especificar si se agrega una fila (ROWS) o una columna (COLUMNS) para matrices.")
+            if isinstance(datos, list):
+                valor.extend(datos)
+            else:
+                valor.append(datos)
         
         self.variables[nombre] = valor
 

@@ -2,11 +2,11 @@ parser grammar lde_parser;
 
 options { tokenVocab=lde_lexer; }
 
-programa: (declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt | regresionLinealStmt)* EOF;
+programa: (sizeStmt | declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt | regresionLinealStmt)* EOF;
 
-declaracion: VAR ID IGUAL (expresion | extraerStmt | regresionLinealStmt);
+declaracion: VAR ID IGUAL (expresion | extraerStmt | regresionLinealStmt | funcionAct | classificadorStmt | predecirStmt | agruparStmt);
 
-modificacion: ID acceso? IGUAL (expresion | extraerStmt | regresionLinealStmt);
+modificacion: ID acceso? IGUAL (expresion | extraerStmt | regresionLinealStmt | funcionAct | classificadorStmt | predecirStmt | agruparStmt);
 
 expresion: termino ((SUMA | RESTA) termino)*;
 
@@ -14,7 +14,7 @@ writeStmt: 'write' LPAREN (expresion | relacional | logico) RPAREN;
 
 graficarStmt: 'plot' LPAREN tipoGrafico COMA expresion (COMA expresion)? RPAREN;
 
-tipoGrafico: BARRASPLOT | HISTOGRAMA | SCATTERPLOT | SCATTERDENS | LINEASPLOT | HEATMAP;
+tipoGrafico: BARRASPLOT | HISTOGRAMA | SCATTERPLOT | SCATTERDENS | LINEASPLOT | HEATMAP | expresion;
 
 extraerStmt: 'extract' LPAREN ARCHIVO RPAREN;
 
@@ -30,7 +30,15 @@ breakStmt: BREAK;
 
 regresionLinealStmt: 'regression' LPAREN expresion COMA expresion RPAREN;
 
-bloque: INBLOCK (declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt | regresionLinealStmt)* ENBLOCK;
+funcionAct: SIGMOID | RELU | TAHACT | SOFTMAX;
+
+classificadorStmt: 'classifier' LPAREN expresion COMA expresion COMA expresion COMA funcionAct COMA expresion COMA expresion RPAREN;
+
+predecirStmt: ID PUNTO 'predict' LPAREN expresion RPAREN;
+
+agruparStmt: 'cluster' LPAREN expresion COMA expresion RPAREN;
+
+bloque: INBLOCK ( sizeStmt | declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt | regresionLinealStmt)* ENBLOCK;
 
 termino: factor ((MULT | DIV | MOD | EXP) factor)*;
 
@@ -51,6 +59,8 @@ acceso: LBRACKET (expresion | ROWS | COLUMNS) RBRACKET acceso?;
 addStmt: PUNTO 'add' LPAREN (ROWS | COLUMNS) COMA expresion RPAREN;
 
 delStmt: PUNTO 'del' LPAREN (ROWS | COLUMNS) COMA expresion RPAREN;
+
+sizeStmt: 'size' LPAREN factor RPAREN;
 
 trigonometrica: (SIN | COS | TAN | ASIN | ACOS | ATAN | SINH | COSH | TANH) LPAREN expresion RPAREN;
 

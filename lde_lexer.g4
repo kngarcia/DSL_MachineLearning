@@ -8,10 +8,18 @@ EXTRAER: 'extract';
 EXPORTAR: 'export';
 ARCHIVO: '\'' [a-zA-Z0-9_/]+ '.' [a-zA-Z0-9]+ '\'';
 REGRESION: 'regression';
-CLASIFICADOR: 'classifier';
 ROWS: 'R';
 COLUMNS: 'C';
+TAMANO: 'size';
+CLASIFICADOR: 'classifier';
+PREDECIR: 'predict';
+AGRUPAR: 'cluster';
 
+//
+SIGMOID: 'sigmoid';
+RELU: 'relu';
+TAHACT: 'tanh_act';
+SOFTMAX: 'softmax';
 //
 BARRASPLOT: 'bar_plot';
 HISTOGRAMA: 'histogram';
@@ -76,7 +84,7 @@ BREAK: 'break';
 COMA: ','; 
 PUNTO: '.';
 // Identificadores para variables
-ID: [a-zA-Z][a-zA-Z0-9]*;
+ID: [a-zA-Z_][a-zA-Z0-9_]*;
 
 // Números (enteros y decimales)
 NUMERO: [0-9]+ ('.' [0-9]+)?;
