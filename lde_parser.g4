@@ -4,7 +4,7 @@ options { tokenVocab=lde_lexer; }
 
 programa: (sizeStmt | declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt | regresionLinealStmt)* EOF;
 
-declaracion: VAR ID IGUAL (expresion | extraerStmt | regresionLinealStmt | funcionAct | classificadorStmt | predecirStmt | agruparStmt);
+declaracion: VAR ID IGUAL (expresion | extraerStmt | regresionLinealStmt | funcionAct | classificadorStmt | predecirStmt | agruparStmt | evaluarStmt );
 
 modificacion: ID acceso? IGUAL (expresion | extraerStmt | regresionLinealStmt | funcionAct | classificadorStmt | predecirStmt | agruparStmt);
 
@@ -35,6 +35,9 @@ funcionAct: SIGMOID | RELU | TAHACT | SOFTMAX;
 classificadorStmt: 'classifier' LPAREN expresion COMA expresion COMA expresion COMA funcionAct COMA expresion COMA expresion RPAREN;
 
 predecirStmt: ID PUNTO 'predict' LPAREN expresion RPAREN;
+
+evaluarStmt: ID PUNTO 'evaluate' LPAREN expresion COMA expresion RPAREN;
+
 
 agruparStmt: 'cluster' LPAREN expresion COMA expresion RPAREN;
 
