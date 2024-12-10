@@ -113,3 +113,42 @@ class MultiLayerPerceptron:
             activations = self.forward_propagation(x_sample)
             predictions.append(activations[-1])
         return predictions
+
+    def evaluate(self, X, y_true):
+        """Evalúa el modelo en un conjunto de datos y devuelve métricas clave."""
+        predictions = self.predict(X)
+
+        total_samples = len(y_true)
+        correct_predictions = 0
+        num_classes = len(y_true[0])
+
+        tp = [0] * num_classes  # True Positives
+        fp = [0] * num_classes  # False Positives
+        fn = [0] * num_classes  # False Negatives
+
+        for i in range(total_samples):
+            predicted_class = predictions[i].index(max(predictions[i]))  # Clase predicha
+            true_class = y_true[i].index(max(y_true[i]))  # Clase verdadera
+
+            if predicted_class == true_class:
+                correct_predictions += 1
+                tp[true_class] += 1
+            else:
+                fp[predicted_class] += 1
+                fn[true_class] += 1
+
+        # Calcular métricas
+        accuracy = correct_predictions / total_samples
+        precision = [tp[c] / (tp[c] + fp[c]) if (tp[c] + fp[c]) > 0 else 0 for c in range(num_classes)]
+        recall = [tp[c] / (tp[c] + fn[c]) if (tp[c] + fn[c]) > 0 else 0 for c in range(num_classes)]
+        f1_score = [
+            2 * (precision[c] * recall[c]) / (precision[c] + recall[c]) if (precision[c] + recall[c]) > 0 else 0
+            for c in range(num_classes)
+        ]
+
+        return {
+            "accuracy": accuracy,
+            "precision": precision,
+            "recall": recall,
+            "f1_score": f1_score,
+        }
