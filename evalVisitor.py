@@ -330,6 +330,48 @@ class evalVisitor(lde_parserVisitor):
         predicciones = modelo.predict(datos_nuevos)
         
         return predicciones
+
+    def visitEvaluarStmt(self, ctx: lde_parser.EvaluarStmtContext):
+        modelo_nombre = ctx.ID(0).getText()
+        if modelo_nombre not in self.variables:
+            raise ValueError(f"Error: La variable '{modelo_nombre}' no está definida.")
+
+        modelo = self.variables[modelo_nombre]
+        if not isinstance(modelo, MultiLayerPerceptron):
+            raise ValueError(f"Error: La variable '{modelo_nombre}' no es un modelo entrenado.")
+        
+        print(f"Evaluando modelo: {ctx.ID(0).getText()}")
+
+        print("Árbol del contexto:")
+        print(ctx.toStringTree(recog=self.parser))
+
+        X_eval = self.visit(ctx.expresion(0))
+        y_eval = self.visit(ctx.expresion(1))
+
+        print(f"Datos de evaluación: X_eval={X_eval}, y_eval={y_eval}")
+
+        if not (self.es_matriz(X_eval) and self.es_matriz(y_eval)):
+            raise ValueError("Error: Los datos de evaluación deben ser matrices.")
+
+        # Depuración adicional: Imprimir la forma y tipo de X_eval y y_eval
+        print(f"Tipo de X_eval: {type(X_eval)}")
+        print(f"Tipo de y_eval: {type(y_eval)}")
+        print(f"Forma de X_eval: {len(X_eval)}x{len(X_eval[0]) if X_eval else 'unknown'}")
+        print(f"Forma de y_eval: {len(y_eval)}x{len(y_eval[0]) if y_eval else 'unknown'}")
+
+        # Evaluar el modelo
+        metricas = modelo.evaluate(X_eval, y_eval)
+
+        # Mostrar las métricas
+        print("Resultados de evaluación:")
+        print(f"Accuracy: {metricas['accuracy']:.4f}")
+        for i, (precision, recall, f1) in enumerate(zip(metricas['precision'], metricas['recall'], metricas['f1_score'])):
+            print(f"Clase {i}:")
+            print(f"  Precision: {precision:.4f}")
+            print(f"  Recall: {recall:.4f}")
+            print(f"  F1-Score: {f1:.4f}")
+
+        return metricas
     def visitAgruparStmt(self, ctx: lde_parser.AgruparStmtContext):
         # Obtener datos y número de clusters desde el contexto
         data = self.visit(ctx.expresion(0))
