@@ -1,13 +1,10 @@
-import math, csv,random
+import math, csv, random
 from lde_parserVisitor import lde_parserVisitor
 from lde_parser import lde_parser
 import matplotlib.pyplot as plt
 from multilayer_perceptron import MultiLayerPerceptron
 from cluster import KMeans
 
-class BreakException(Exception):
-    """Excepción personalizada para manejar 'break'."""
-    pass
 class BreakException(Exception):
     """Excepción personalizada para manejar 'break'."""
     pass
@@ -23,9 +20,25 @@ class evalVisitor(lde_parserVisitor):
     def es_vector(self, estructura):
         return isinstance(estructura, list) and all(not isinstance(x, list) for x in estructura)
 
+    def format_number(self, value):
+        if isinstance(value, float):
+            if value.is_integer():
+                return str(int(value))
+            elif abs(value) < 1e-3 and value != 0.0:
+                # Mostrar en notación científica para números muy pequeños
+                return f"{value:.8e}"
+            else:
+                # Redondear a 8 decimales y evitar ceros finales innecesarios
+                rounded = round(value, 8)
+                formatted = f"{rounded:.8f}".rstrip('0').rstrip('.')
+                return formatted
+        else:
+            return str(value)
+
     def visitPrograma(self, ctx: lde_parser.ProgramaContext):
         resultados = [self.visit(child) for child in ctx.getChildren()]
         return [r for r in resultados if r is not None]
+
     def visitSizeStmt(self, ctx: lde_parser.SizeStmtContext):
         valor = self.visit(ctx.factor())
         
@@ -33,6 +46,7 @@ class evalVisitor(lde_parserVisitor):
             return len(valor)
         else:
             raise ValueError("Error: La función size solo se puede aplicar a listas o matrices.")
+
     def visitDeclaracion(self, ctx: lde_parser.DeclaracionContext):
         nombre = ctx.ID().getText()
         if ctx.extraerStmt():
@@ -50,8 +64,8 @@ class evalVisitor(lde_parserVisitor):
         else:
             valor = self.visit(ctx.expresion())
         self.variables[nombre] = valor
-        return f"Variable '{nombre}' asignada con el valor {valor}."
-    
+        return f"Variable '{nombre}' asignada con el valor {self.format_number(valor)}."
+
     def visitModificacion(self, ctx: lde_parser.ModificacionContext):
         nombre = ctx.ID().getText()
         if nombre not in self.variables:
@@ -140,7 +154,8 @@ class evalVisitor(lde_parserVisitor):
             # Si no hay acceso, reemplaza toda la variable
             self.variables[nombre] = nuevo_valor
         
-        return f"Variable '{nombre}' modificada con el valor {nuevo_valor}."
+        return f"Variable '{nombre}' modificada con el valor {self.format_number(nuevo_valor)}."
+
     def visitWriteStmt(self, ctx: lde_parser.WriteStmtContext):
         if ctx.expresion():
             valor = self.visit(ctx.expresion())
@@ -151,8 +166,11 @@ class evalVisitor(lde_parserVisitor):
         else:
             raise ValueError("Error: Tipo de expresión no reconocido en writeStmt.")
         
-        print(valor)
-        return valor
+        # Formatear el valor antes de imprimirlo
+        valor_formateado = self.format_number(valor)
+        print(valor_formateado)
+        return valor_formateado
+
     def visitGraficarStmt(self, ctx: lde_parser.GraficarStmtContext):
         tipo_grafico = ctx.tipoGrafico().getText()
         x = self.visit(ctx.expresion(0))
@@ -229,6 +247,7 @@ class evalVisitor(lde_parserVisitor):
         if len(matriz) == 1:
             return matriz[0]
         return matriz
+
     def visitExportarStmt(self, ctx: lde_parser.ExportarStmtContext):
         data = self.visit(ctx.expresion())
         archivo = ctx.ARCHIVO().getText()[1:-1]  # Eliminar las comillas alrededor del nombre del archivo
@@ -241,7 +260,7 @@ class evalVisitor(lde_parserVisitor):
                 writer.writerow(data)
             else:
                 raise ValueError("Error: Solo se pueden exportar vectores y matrices.")
-            
+
     def visitRegresionLinealStmt(self, ctx: lde_parser.RegresionLinealStmtContext):
         x = self.visit(ctx.expresion(0))
         y = self.visit(ctx.expresion(1))
@@ -286,8 +305,14 @@ class evalVisitor(lde_parserVisitor):
         plt.legend()
         plt.show()
 
-        # Retornar los resultados como una lista
-        return [m, b, mse, r_squared, se_m]
+        # Retornar los resultados como una lista formateada
+        return [
+            self.format_number(m),
+            self.format_number(b),
+            self.format_number(mse),
+            self.format_number(r_squared),
+            self.format_number(se_m)
+        ]
 
     def visitClassificadorStmt(self, ctx: lde_parser.ClassificadorStmtContext):
         X = self.visit(ctx.expresion(0))
@@ -317,6 +342,7 @@ class evalVisitor(lde_parserVisitor):
         mlp.train()
 
         return mlp
+
     def visitPredecirStmt(self, ctx: lde_parser.PredecirStmtContext):
         nombre = ctx.ID().getText()
         if nombre not in self.variables:
@@ -328,6 +354,12 @@ class evalVisitor(lde_parserVisitor):
         
         datos_nuevos = self.visit(ctx.expresion())
         predicciones = modelo.predict(datos_nuevos)
+        
+        # Formatear predicciones antes de retornarlas
+        if isinstance(predicciones, list):
+            predicciones = [self.format_number(pred) for pred in predicciones]
+        else:
+            predicciones = self.format_number(predicciones)
         
         return predicciones
 
@@ -362,16 +394,25 @@ class evalVisitor(lde_parserVisitor):
         # Evaluar el modelo
         metricas = modelo.evaluate(X_eval, y_eval)
 
+        # Formatear las métricas antes de mostrarlas
+        metricas_formateadas = {
+            'accuracy': self.format_number(metricas['accuracy']),
+            'precision': [self.format_number(p) for p in metricas['precision']],
+            'recall': [self.format_number(r) for r in metricas['recall']],
+            'f1_score': [self.format_number(f) for f in metricas['f1_score']]
+        }
+
         # Mostrar las métricas
         print("Resultados de evaluación:")
-        print(f"Accuracy: {metricas['accuracy']:.4f}")
-        for i, (precision, recall, f1) in enumerate(zip(metricas['precision'], metricas['recall'], metricas['f1_score'])):
+        print(f"Accuracy: {metricas_formateadas['accuracy']}")
+        for i, (precision, recall, f1) in enumerate(zip(metricas_formateadas['precision'], metricas_formateadas['recall'], metricas_formateadas['f1_score'])):
             print(f"Clase {i}:")
-            print(f"  Precision: {precision:.4f}")
-            print(f"  Recall: {recall:.4f}")
-            print(f"  F1-Score: {f1:.4f}")
+            print(f"  Precision: {precision}")
+            print(f"  Recall: {recall}")
+            print(f"  F1-Score: {f1}")
 
-        return metricas
+        return metricas_formateadas
+
     def visitAgruparStmt(self, ctx: lde_parser.AgruparStmtContext):
         # Obtener datos y número de clusters desde el contexto
         data = self.visit(ctx.expresion(0))
@@ -395,7 +436,11 @@ class evalVisitor(lde_parserVisitor):
         # Obtener los clusters predichos
         clusters = kmeans.predict(data)
 
-        return clusters
+        # Formatear los clusters antes de retornarlos
+        clusters_formateados = [self.format_number(c) for c in clusters]
+
+        return clusters_formateados
+
     def visitExpresion(self, ctx: lde_parser.ExpresionContext):
         izquierda = self.visit(ctx.termino(0))
         for i in range(1, len(ctx.termino())):
@@ -406,7 +451,7 @@ class evalVisitor(lde_parserVisitor):
             elif operador == '-':
                 izquierda = self.sumar_o_restaurar(izquierda, derecha, 'restar')
         return izquierda
-    
+
     def visitTermino(self, ctx: lde_parser.TerminoContext):
         izquierda = self.visit(ctx.factor(0))
         for i in range(1, len(ctx.factor())):
@@ -421,7 +466,7 @@ class evalVisitor(lde_parserVisitor):
             elif operador == '%':
                 izquierda = self.modulo(izquierda, derecha)
         return izquierda
-    
+
     def visitIfStmt(self, ctx: lde_parser.IfStmtContext):
         if ctx.relacional():
             condicion = self.visit(ctx.relacional())
@@ -434,6 +479,7 @@ class evalVisitor(lde_parserVisitor):
             self.visit(ctx.bloque(0))
         elif ctx.bloque(1):
             self.visit(ctx.bloque(1))
+
     def visitRelacional(self, ctx: lde_parser.RelacionalContext):
         izquierda = self.visit(ctx.expresion(0))
         operador = ctx.getChild(1).getText()
@@ -453,6 +499,7 @@ class evalVisitor(lde_parserVisitor):
             return izquierda != derecha
         else:
             raise ValueError(f"Operador relacional no reconocido: {operador}")
+
     def visitLogico(self, ctx: lde_parser.LogicoContext):
         if ctx.NOT():
             return not self.visit(ctx.expresion(0))
@@ -530,7 +577,9 @@ class evalVisitor(lde_parserVisitor):
         raise BreakException()
     
     def visitFactor(self, ctx: lde_parser.FactorContext):
-        if ctx.NUMERO():
+        if ctx.sizeStmt():
+            return self.visit(ctx.sizeStmt())
+        elif ctx.NUMERO():
             return float(ctx.NUMERO().getText()) if '.' in ctx.NUMERO().getText() else int(ctx.NUMERO().getText())
         elif ctx.ID():
             nombre = ctx.ID().getText()
@@ -586,8 +635,8 @@ class evalVisitor(lde_parserVisitor):
                     raise IndexError("Error: Índice de fila fuera de rango.")
                 
                 # Obtener la fila
-                return valor[indice_fila]
-
+                valor = valor[indice_fila]
+            
             # Acceso por columnas (C)
             elif ctx.COLUMNS():
                 if not all(isinstance(sublista, list) for sublista in valor):
@@ -610,8 +659,8 @@ class evalVisitor(lde_parserVisitor):
                     raise IndexError("Error: Índice de columna fuera de rango.")
                 
                 # Obtener la columna
-                return [fila[indice_columna] for fila in valor]
-
+                valor = [fila[indice_columna] for fila in valor]
+            
             # Acceso directo por índice
             else:
                 indice = self.visit(ctx.expresion())
@@ -624,8 +673,6 @@ class evalVisitor(lde_parserVisitor):
             ctx = ctx.acceso()
         
         return valor
-
-
 
     def visitAddStmt(self, ctx: lde_parser.AddStmtContext, nombre):
         if nombre not in self.variables:
@@ -673,7 +720,6 @@ class evalVisitor(lde_parserVisitor):
         
         self.variables[nombre] = valor
 
-    
     def visitDelStmt(self, ctx: lde_parser.DelStmtContext, nombre):
         if nombre not in self.variables:
             raise ValueError(f"Error: La variable '{nombre}' no está definida.")
@@ -705,8 +751,6 @@ class evalVisitor(lde_parserVisitor):
         
         self.variables[nombre] = valor
 
-
-    
     def visitLista(self, ctx: lde_parser.ListaContext):
         # Handle list expressions like [1, 2, 3]
         return [self.visit(exp) for exp in ctx.expresion()]
@@ -720,7 +764,10 @@ class evalVisitor(lde_parserVisitor):
             'sinh': math.sinh, 'cosh': math.cosh, 'tanh': math.tanh
         }
         if operador in funciones_trigonometricas:
-            return round(funciones_trigonometricas[operador](math.radians(argumento)), 4)
+            resultado = funciones_trigonometricas[operador](math.radians(argumento))
+            # Formatear el resultado
+            resultado_formateado = self.format_number(resultado)
+            return float(resultado_formateado) if '.' in resultado_formateado else int(resultado_formateado)
         else:
             raise ValueError(f"Error: Función trigonométrica no reconocida '{operador}'.")
 
@@ -749,7 +796,6 @@ class evalVisitor(lde_parserVisitor):
             resultado.append(fila_resultado)
         return resultado
 
-
     def multiplicar(self, a, b):
         if self.es_matriz(a) and self.es_matriz(b):
             return self.multiplicar_matrices(a, b)
@@ -770,7 +816,6 @@ class evalVisitor(lde_parserVisitor):
             # Producto normal para escalares
             return a * b
 
-
     def multiplicar_por_escalar(self, estructura, escalar):
         if self.es_vector(estructura):
             # Multiplica cada elemento del vector por el escalar
@@ -780,7 +825,6 @@ class evalVisitor(lde_parserVisitor):
             return [[x * escalar for x in fila] for fila in estructura]
         else:
             raise ValueError("Error: Solo se pueden multiplicar vectores o matrices por un escalar.")
-
 
     def dividir(self, a, b):
         if isinstance(a, list) or isinstance(b, list):

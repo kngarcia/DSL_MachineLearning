@@ -38,7 +38,6 @@ predecirStmt: ID PUNTO 'predict' LPAREN expresion RPAREN;
 
 evaluarStmt: ID PUNTO 'evaluate' LPAREN expresion COMA expresion RPAREN;
 
-
 agruparStmt: 'cluster' LPAREN expresion COMA expresion RPAREN;
 
 bloque: INBLOCK ( sizeStmt | declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt | regresionLinealStmt)* ENBLOCK;
@@ -47,6 +46,7 @@ termino: factor ((MULT | DIV | MOD | EXP) factor)*;
 
 factor: NUMERO
       | ID (acceso | addStmt | delStmt)?                // Referencias a variables con acceso opcional a elementos
+      | sizeStmt                                       // **Agregar sizeStmt aquí**
       | LPAREN expresion RPAREN
       | RESTA factor
       | trigonometrica
