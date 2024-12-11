@@ -2,9 +2,9 @@ parser grammar lde_parser;
 
 options { tokenVocab=lde_lexer; }
 
-programa: (sizeStmt | declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt | regresionLinealStmt)* EOF;
+programa: ( metricasStmt |sizeStmt | declaracion | expresion | (relacional | logico) | writeStmt | graficarStmt | exportarStmt | modificacion | ifStmt | forStmt | whileStmt | breakStmt | regresionLinealStmt)* EOF;
 
-declaracion: VAR ID IGUAL (expresion | extraerStmt | regresionLinealStmt | funcionAct | classificadorStmt | predecirStmt | agruparStmt | evaluarStmt );
+declaracion: VAR ID IGUAL (expresion | extraerStmt | regresionLinealStmt | funcionAct | classificadorStmt | predecirStmt | agruparStmt);
 
 modificacion: ID acceso? IGUAL (expresion | extraerStmt | regresionLinealStmt | funcionAct | classificadorStmt | predecirStmt | agruparStmt);
 
@@ -36,7 +36,7 @@ classificadorStmt: 'classifier' LPAREN expresion COMA expresion COMA expresion C
 
 predecirStmt: ID PUNTO 'predict' LPAREN expresion RPAREN;
 
-evaluarStmt: ID PUNTO 'evaluate' LPAREN expresion COMA expresion RPAREN;
+metricasStmt: METRICAS LPAREN ID RPAREN;  // Nueva regla
 
 agruparStmt: 'cluster' LPAREN expresion COMA expresion RPAREN;
 
