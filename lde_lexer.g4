@@ -12,7 +12,7 @@ ROWS: 'R';
 COLUMNS: 'C';
 TAMANO: 'size';
 CLASIFICADOR: 'classifier';
-EVALUAR: 'evaluate';
+METRICAS: 'mostrarMetricas';
 PREDECIR: 'predict';
 AGRUPAR: 'cluster';
 
