@@ -113,42 +113,37 @@ class MultiLayerPerceptron:
             activations = self.forward_propagation(x_sample)
             predictions.append(activations[-1])
         return predictions
+        
+    def evaluate(self, X_test, y_test):
+        """Evalúa el modelo en un conjunto de prueba y calcula métricas de rendimiento."""
+        predictions = self.predict(X_test)
+        if isinstance(y_test[0], list):  # Clasificación con codificación one-hot
+            y_test = [yt.index(1) for yt in y_test]
+            predictions = [pred.index(max(pred)) for pred in predictions]
 
-    def evaluate(self, X, y_true):
-        """Evalúa el modelo en un conjunto de datos y devuelve métricas clave."""
-        predictions = self.predict(X)
+        if all(isinstance(y, int) for y in y_test):  # Clasificación
+            true_positive = sum(1 for yt, yp in zip(y_test, predictions) if yt == yp)
+            precision = true_positive / len(predictions)
+            return {
+                "precision": precision,
+                "accuracy": precision,  # Igual para este caso binario
+            }
+        else:  # Regresión
+            mse = sum((yt - yp) ** 2 for yt, yp in zip(y_test, predictions)) / len(y_test)
+            mean_y = sum(y_test) / len(y_test)
+            sst = sum((yt - mean_y) ** 2 for yt in y_test)
+            sse = sum((yt - yp) ** 2 for yt, yp in zip(y_test, predictions))
+            r_squared = 1 - (sse / sst)
+            return {
+                "mse": mse,
+                "r_squared": r_squared
+            }
 
-        total_samples = len(y_true)
-        correct_predictions = 0
-        num_classes = len(y_true[0])
-
-        tp = [0] * num_classes  # True Positives
-        fp = [0] * num_classes  # False Positives
-        fn = [0] * num_classes  # False Negatives
-
-        for i in range(total_samples):
-            predicted_class = predictions[i].index(max(predictions[i]))  # Clase predicha
-            true_class = y_true[i].index(max(y_true[i]))  # Clase verdadera
-
-            if predicted_class == true_class:
-                correct_predictions += 1
-                tp[true_class] += 1
-            else:
-                fp[predicted_class] += 1
-                fn[true_class] += 1
-
-        # Calcular métricas
-        accuracy = correct_predictions / total_samples
-        precision = [tp[c] / (tp[c] + fp[c]) if (tp[c] + fp[c]) > 0 else 0 for c in range(num_classes)]
-        recall = [tp[c] / (tp[c] + fn[c]) if (tp[c] + fn[c]) > 0 else 0 for c in range(num_classes)]
-        f1_score = [
-            2 * (precision[c] * recall[c]) / (precision[c] + recall[c]) if (precision[c] + recall[c]) > 0 else 0
-            for c in range(num_classes)
-        ]
-
+    def get_metrics(self):
+        """Devuelve un resumen de las métricas del modelo."""
         return {
-            "accuracy": accuracy,
-            "precision": precision,
-            "recall": recall,
-            "f1_score": f1_score,
+            "epochs": self.epochs,
+            "learning_rate": self.learning_rate,
+            "layers": self.layers,
+            "activation_function": self.activation_function_name
         }
