@@ -362,56 +362,28 @@ class evalVisitor(lde_parserVisitor):
             predicciones = self.format_number(predicciones)
         
         return predicciones
+    
+    def visitMetricasStmt(self, ctx: lde_parser.MetricasStmtContext):
+        nombre = ctx.ID().getText()
+        if nombre not in self.variables:
+            raise ValueError(f"Error: El modelo '{nombre}' no está definido.")
 
-    def visitEvaluarStmt(self, ctx: lde_parser.EvaluarStmtContext):
-        modelo_nombre = ctx.ID(0).getText()
-        if modelo_nombre not in self.variables:
-            raise ValueError(f"Error: La variable '{modelo_nombre}' no está definida.")
-
-        modelo = self.variables[modelo_nombre]
+        modelo = self.variables[nombre]
         if not isinstance(modelo, MultiLayerPerceptron):
-            raise ValueError(f"Error: La variable '{modelo_nombre}' no es un modelo entrenado.")
-        
-        print(f"Evaluando modelo: {ctx.ID(0).getText()}")
+            raise ValueError(f"Error: La variable '{nombre}' no es un modelo entrenado.")
 
-        print("Árbol del contexto:")
-        print(ctx.toStringTree(recog=self.parser))
+        # Solicitar datos de prueba al usuario si no están en el entorno
+        if "X_test" not in self.variables or "y_test" not in self.variables:
+            raise ValueError("Error: Datos de prueba (X_test, y_test) no definidos. Asegúrate de definirlos antes de llamar a 'mostrarMetricas'.")
 
-        X_eval = self.visit(ctx.expresion(0))
-        y_eval = self.visit(ctx.expresion(1))
+        X_test = self.variables["X_test"]
+        y_test = self.variables["y_test"]
 
-        print(f"Datos de evaluación: X_eval={X_eval}, y_eval={y_eval}")
-
-        if not (self.es_matriz(X_eval) and self.es_matriz(y_eval)):
-            raise ValueError("Error: Los datos de evaluación deben ser matrices.")
-
-        # Depuración adicional: Imprimir la forma y tipo de X_eval y y_eval
-        print(f"Tipo de X_eval: {type(X_eval)}")
-        print(f"Tipo de y_eval: {type(y_eval)}")
-        print(f"Forma de X_eval: {len(X_eval)}x{len(X_eval[0]) if X_eval else 'unknown'}")
-        print(f"Forma de y_eval: {len(y_eval)}x{len(y_eval[0]) if y_eval else 'unknown'}")
-
-        # Evaluar el modelo
-        metricas = modelo.evaluate(X_eval, y_eval)
-
-        # Formatear las métricas antes de mostrarlas
-        metricas_formateadas = {
-            'accuracy': self.format_number(metricas['accuracy']),
-            'precision': [self.format_number(p) for p in metricas['precision']],
-            'recall': [self.format_number(r) for r in metricas['recall']],
-            'f1_score': [self.format_number(f) for f in metricas['f1_score']]
-        }
-
-        # Mostrar las métricas
-        print("Resultados de evaluación:")
-        print(f"Accuracy: {metricas_formateadas['accuracy']}")
-        for i, (precision, recall, f1) in enumerate(zip(metricas_formateadas['precision'], metricas_formateadas['recall'], metricas_formateadas['f1_score'])):
-            print(f"Clase {i}:")
-            print(f"  Precision: {precision}")
-            print(f"  Recall: {recall}")
-            print(f"  F1-Score: {f1}")
-
-        return metricas_formateadas
+        metrics = modelo.evaluate(X_test, y_test)
+        print("Resumen de métricas del modelo:")
+        for key, value in metrics.items():
+            print(f"{key}: {value}")
+        return metrics
 
     def visitAgruparStmt(self, ctx: lde_parser.AgruparStmtContext):
         # Obtener datos y número de clusters desde el contexto
