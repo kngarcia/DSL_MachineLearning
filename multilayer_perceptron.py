@@ -122,11 +122,37 @@ class MultiLayerPerceptron:
             predictions = [pred.index(max(pred)) for pred in predictions]
 
         if all(isinstance(y, int) for y in y_test):  # Clasificación
-            true_positive = sum(1 for yt, yp in zip(y_test, predictions) if yt == yp)
-            precision = true_positive / len(predictions)
+            num_classes = max(y_test) + 1
+            true_positives = [0] * num_classes
+            false_positives = [0] * num_classes
+            false_negatives = [0] * num_classes
+
+            for yt, yp in zip(y_test, predictions):
+                if yt == yp:
+                    true_positives[yt] += 1
+                else:
+                    false_positives[yp] += 1
+                    false_negatives[yt] += 1
+
+            precision = [
+                tp / (tp + fp) if (tp + fp) > 0 else 0.0
+                for tp, fp in zip(true_positives, false_positives)
+            ]
+            recall = [
+                tp / (tp + fn) if (tp + fn) > 0 else 0.0
+                for tp, fn in zip(true_positives, false_negatives)
+            ]
+            f1_score = [
+                2 * p * r / (p + r) if (p + r) > 0 else 0.0
+                for p, r in zip(precision, recall)
+            ]
+            overall_accuracy = sum(true_positives) / len(y_test)
+
             return {
                 "precision": precision,
-                "accuracy": precision,  # Igual para este caso binario
+                "recall": recall,
+                "f1_score": f1_score,
+                "accuracy": overall_accuracy
             }
         else:  # Regresión
             mse = sum((yt - yp) ** 2 for yt, yp in zip(y_test, predictions)) / len(y_test)
