@@ -125,8 +125,8 @@ var k = 3
 var clusters = cluster(data, k)
 write(clusters)
 
-## Perceptron
-### Regesión
+## Perceptrón
+### Regresión
 var X_train = [[1.0], [2.0], [3.0], [4.0]]
 var y_train = [2.0, 4.0, 6.0, 8.0]  
 
