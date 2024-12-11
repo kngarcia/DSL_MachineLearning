@@ -127,3 +127,23 @@ write(clusters)
 
 ## Perceptron
 
+var X_train = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [0.0, 0.0]]
+var y_train = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0]]
+
+
+var layers = [2, 5, 3]
+var learningrate = 0.01
+var epochs = 2000
+
+
+var mlp_classification = classifier(X_train, y_train, layers, sigmoid, learningrate, epochs)
+
+var X_test = [[0.9, 0.0], [0.0, 0.9], [0.5, 0.5], [0.2, 0.8]]
+var y_test = [[1, 0, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]]
+
+var prediciton = mlp_classification.predict(X_test)
+
+
+write(prediciton)
+mostrarMetricas(mlp_classification)
+
